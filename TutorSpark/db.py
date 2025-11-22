@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Iterable, Optional, Set
 
 from models import LearnerProfile, QuizSession
 
@@ -23,10 +23,12 @@ def init_db() -> None:
     Tables:
       - learner_profiles
       - quiz_sessions
+      - seen_questions (which questions a profile has already faced)
     """
     conn = get_connection()
     cur = conn.cursor()
 
+    # learner_profiles now stores hero_class
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS learner_profiles (
@@ -34,7 +36,7 @@ def init_db() -> None:
             name TEXT NOT NULL,
             level TEXT NOT NULL,
             focus_area TEXT NOT NULL,
-            hero_class TEXT NOT NULL
+            hero_class TEXT NOT NULL DEFAULT 'Warrior'
         );
         """
     )
@@ -48,6 +50,18 @@ def init_db() -> None:
             total_questions INTEGER NOT NULL,
             correct_answers INTEGER NOT NULL,
             created_at TEXT NOT NULL,
+            FOREIGN KEY(profile_id) REFERENCES learner_profiles(id)
+        );
+        """
+    )
+
+    # NEW: track which questions each profile has already seen
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS seen_questions (
+            profile_id INTEGER NOT NULL,
+            question_id INTEGER NOT NULL,
+            PRIMARY KEY (profile_id, question_id),
             FOREIGN KEY(profile_id) REFERENCES learner_profiles(id)
         );
         """
@@ -100,12 +114,20 @@ def insert_profile(profile: LearnerProfile) -> LearnerProfile:
 
 def reset_all_data() -> None:
     """
-    Deletes the SQLite file and recreates an empty schema.
-    Used when the player chooses 'Start a new hero' in profile.py.
+    Used when the player chooses 'Start a new hero' and types RESET.
     """
-    if DB_PATH.exists():
-        DB_PATH.unlink()
-    init_db()
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.executescript(
+        """
+        DELETE FROM seen_questions;
+        DELETE FROM quiz_sessions;
+        DELETE FROM learner_profiles;
+        VACUUM;
+        """
+    )
+    conn.commit()
+    conn.close()
 
 
 # --- Quiz session helpers ----------------------------------------------------
@@ -116,9 +138,7 @@ def insert_quiz_session(session: QuizSession) -> QuizSession:
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO quiz_sessions (
-            profile_id, topic, total_questions, correct_answers, created_at
-        )
+        INSERT INTO quiz_sessions (profile_id, topic, total_questions, correct_answers, created_at)
         VALUES (?, ?, ?, ?, ?);
         """,
         (
@@ -133,3 +153,59 @@ def insert_quiz_session(session: QuizSession) -> QuizSession:
     session.id = cur.lastrowid
     conn.close()
     return session
+
+
+def count_quiz_sessions_for_profile(profile_id: int) -> int:
+    """
+    How many quiz sessions this profile has completed (all focus areas).
+    Used to scale difficulty/length: later quizzes = more questions.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT COUNT(*) AS c FROM quiz_sessions WHERE profile_id = ?;",
+        (profile_id,),
+    )
+    row = cur.fetchone()
+    conn.close()
+    return int(row["c"] if row is not None else 0)
+
+
+# --- Seen-questions helpers (for multi-level, no-repeat quizzes) ------------
+
+
+def get_seen_question_ids_for_profile(profile_id: int) -> Set[int]:
+    """
+    Return the set of question_ids this profile has already seen in any session.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT question_id FROM seen_questions WHERE profile_id = ?;",
+        (profile_id,),
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return {int(r["question_id"]) for r in rows}
+
+
+def mark_questions_seen(profile_id: int, question_ids: Iterable[int]) -> None:
+    """
+    Mark a batch of question IDs as 'seen' for this profile.
+    Called at the end of each quiz session so future runs can avoid repeats.
+    """
+    ids = list(set(int(qid) for qid in question_ids))
+    if not ids:
+        return
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.executemany(
+        """
+        INSERT OR IGNORE INTO seen_questions (profile_id, question_id)
+        VALUES (?, ?);
+        """,
+        [(profile_id, qid) for qid in ids],
+    )
+    conn.commit()
+    conn.close()

@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+"""
+engine.py
+
+Core battle engine for TutorSpark CLI.
+
+- Renders RPG-style battles for a *single* quiz run.
+- Uses hero_class to set HP + lifelines.
+- Shows quest titles (10-quest story per hero class).
+- At the end of the run, records a QuizSession and marks which
+  questions this hero has already seen in the DB.
+"""
+
 import os
 import random
 import time
@@ -77,7 +89,80 @@ def render_run_path(current_battle: int, total: int) -> str:
     return " ".join(segments)
 
 
-# === Domain helpers =========================================================
+# === Quest story helpers =====================================================
+
+QUEST_TITLES = {
+    "warrior": [
+        "Training Grounds",
+        "Dungeon of Debugging",
+        "The Stack Overflow Keep",
+        "Refactor Ravine",
+        "Merge Conflict Marsh",
+        "The Big-O Arena",
+        "Tower of Recursion",
+        "Heapfire Citadel",
+        "The Integration Gauntlet",
+        "Final Boss: Legacy Code Dragon",
+    ],
+    "mage": [
+        "Circle of Recursion",
+        "Forest of Functions",
+        "Lambda Labyrinth",
+        "Memoization Monastery",
+        "Graph Grove",
+        "Dynamic Dungeon",
+        "The Sorting Spire",
+        "Complexity Crags",
+        "The Compiler’s Court",
+        "Final Boss: Runtime Wraith",
+    ],
+    "healer": [
+        "Clinic of Unit Tests",
+        "Ward of Assertions",
+        "Coverage Cathedral",
+        "Regression Ruins",
+        "Refactor Refuge",
+        "Sandbox Sanctuary",
+        "Mockingbird Monastery",
+        "Pipeline Infirmary",
+        "On-Call Citadel",
+        "Final Boss: Production Pager Storm",
+    ],
+    "neo pro": [
+        "Bootloader Backstreets",
+        "Kernel Crossroads",
+        "Container Coliseum",
+        "CI/CD Skyline",
+        "Microservice Maze",
+        "Concurrency Crossfire",
+        "Distributed Dungeon",
+        "Zero-Day Zone",
+        "Code Nexus Summit",
+        "Final Boss: The Infinite Loop",
+    ],
+}
+
+
+def get_quest_number(profile: LearnerProfile) -> int:
+    """
+    Determine which quest this hero is on based on completed quiz sessions.
+    completed=0 -> Quest 1, completed=1 -> Quest 2, etc.; clamped to 10.
+    """
+    if profile.id is None:
+        return 1
+    completed = db.count_quiz_sessions_for_profile(profile.id)
+    return min(completed + 1, 10)
+
+
+def get_quest_title(profile: LearnerProfile, quest_number: int) -> str:
+    """Return the story title for the given hero and quest number (1–10)."""
+    key = profile.hero_class.lower()
+    titles = QUEST_TITLES.get(key, QUEST_TITLES["warrior"])
+    idx = min(max(quest_number, 1), len(titles)) - 1
+    return titles[idx]
+
+
+# === Domain helpers (hints, grades, etc.) ===================================
 
 _HINTS = {
     1: "Think divide-and-conquer: you keep halving the search space.",
@@ -192,27 +277,20 @@ def hero_stats(profile: LearnerProfile) -> Tuple[int, int, int, int, int, int]:
     Map hero_class to starting stats.
 
     Returns:
-      max_hp, damage_on_hit, hints_left, fifty_fifty_left, calls_left, free_passes
+      max_hp, damage_on_hit, hints_left, fifty_fifty_left,
+      calls_left, free_passes
     """
     hc = profile.hero_class.lower()
 
-    # Warrior – Beginner: high HP, forgiving
-    if hc == "warrior":
+    if hc == "warrior":       # Beginner
         return 24, 3, 4, 2, 1, 0
-
-    # Mage – Intermediate: balanced, extra hints
-    if hc == "mage":
+    if hc == "mage":          # Intermediate
         return 20, 4, 5, 1, 1, 0
-
-    # Healer – Advanced: slightly lower HP, +1 free pass
-    if hc == "healer":
+    if hc == "healer":        # Advanced
         return 18, 3, 3, 2, 1, 1
-
-    # NEO PRO – Expert: lowest HP, minimal lifelines
-    if hc == "neo pro":
+    if hc == "neo pro":       # Expert
         return 16, 5, 2, 1, 0, 0
 
-    # Fallback defaults
     return 20, 4, 3, 2, 1, 0
 
 
@@ -222,15 +300,9 @@ class AdaptiveEngine:
     """
     AdaptiveEngine composes a QuestionSelectionStrategy.
 
-    Matches your 2.1 Strategy design:
-      - AdaptiveEngine has a composition relationship with QuestionSelectionStrategy.
-      - Concrete strategies (SequentialStrategy, RandomStrategy) implement the interface.
-
-    Here we layer on:
-      - RPG-style HP battles and HUD
-      - Lifelines: Hint (text clue), 50/50, Call a friend, Free pass
-      - XP, streaks, badges, progress bar
-      - QuizSession persistence for analytics/V&V
+    - Uses the chosen strategy to select questions from the bank.
+    - Runs one full "quest" (quiz) with HP, lifelines, and XP.
+    - Records the QuizSession and marks questions seen for this hero.
     """
 
     def __init__(self, selection_strategy: QuestionSelectionStrategy) -> None:
@@ -240,7 +312,7 @@ class AdaptiveEngine:
         self,
         profile: LearnerProfile,
         question_bank: List[Question],
-        limit: int = 5,
+        limit: int = 10,
     ) -> QuizSession:
         selected = self._selection_strategy.select_questions(
             question_bank,
@@ -253,12 +325,15 @@ class AdaptiveEngine:
         current_streak = 0
         best_streak = 0
 
-        # Hero-based stats
         max_hp, damage_on_hit, hints_left, fifty_fifty_left, calls_left, free_passes = hero_stats(profile)
         hp = max_hp
 
+        quest_number = get_quest_number(profile)
+        quest_title = get_quest_title(profile, quest_number)
+
         clear_screen()
         print_banner("TutorSpark Training Grounds")
+        print(color(f"Quest {quest_number}: {quest_title}", BOLD))
         print(
             color(
                 f"Hero: {profile.name} the {profile.hero_class}  |  "
@@ -307,7 +382,6 @@ class AdaptiveEngine:
                 is_correct = False
                 used_free_pass = False
 
-                # Answer
                 if raw in {"1", "2", "3", "4"}:
                     answer_idx = int(raw) - 1
                     if answer_idx in hidden_indices:
@@ -316,7 +390,6 @@ class AdaptiveEngine:
                     is_correct = (answer_idx == q.correct_index)
                     break
 
-                # Hint (text clue only)
                 elif raw == "H":
                     if hints_left <= 0:
                         print("You have no hints left.")
@@ -330,7 +403,6 @@ class AdaptiveEngine:
                     print(color(f"Hint: {hint_text}", CYAN))
                     continue
 
-                # 50/50
                 elif raw == "F":
                     if fifty_fifty_left <= 0:
                         print("You have no 50/50 lifelines left.")
@@ -344,7 +416,6 @@ class AdaptiveEngine:
                     print(color(msg, CYAN))
                     continue
 
-                # Call a friend
                 elif raw == "C":
                     if calls_left <= 0:
                         print("You have no calls left.")
@@ -364,7 +435,6 @@ class AdaptiveEngine:
                     )
                     continue
 
-                # Free pass
                 elif raw == "P":
                     if free_passes <= 0:
                         print("You don't have any free passes yet. "
@@ -380,7 +450,6 @@ class AdaptiveEngine:
                     print("Invalid choice. Try again.")
                     continue
 
-            # Resolve outcome
             if is_correct:
                 print(color("✨ Correct! The enemy is defeated.", GREEN, BOLD))
                 correct += 1
@@ -388,7 +457,6 @@ class AdaptiveEngine:
                 if not used_free_pass:
                     current_streak += 1
                     best_streak = max(best_streak, current_streak)
-
                     if current_streak > 0 and current_streak % 3 == 0:
                         free_passes += 1
                         print(
@@ -417,7 +485,6 @@ class AdaptiveEngine:
                     print(color("\n💀 You are out of HP for this training run!", RED, BOLD))
                     break
 
-        # Summary
         score_percent = (correct / total * 100) if total else 0.0
         grade, feedback = compute_grade_and_feedback(score_percent)
         badge = assign_badge(score_percent, total, correct)
@@ -442,10 +509,14 @@ class AdaptiveEngine:
         session = QuizSession(
             id=None,
             profile_id=profile.id or 0,
-            topic="CS Fundamentals (Milestone 1)",
+            topic=f"Quest {quest_number} – CS Questline",
             total_questions=total,
             correct_answers=correct,
             created_at=datetime.utcnow(),
         )
         db.insert_quiz_session(session)
+
+        if profile.id is not None and selected:
+            db.mark_questions_seen(profile.id, [q.id for q in selected])
+
         return session

@@ -3,7 +3,9 @@ from __future__ import annotations
 from profile import load_or_create_profile
 
 import db
-from quiz import run_quiz_for_profile
+from engine import AdaptiveEngine
+from quiz import run_quest_for_profile
+from strategies import RandomStrategy
 
 
 def main() -> None:
@@ -13,16 +15,20 @@ def main() -> None:
     # Load or create learner profile
     profile = load_or_create_profile()
 
-    # Simple menu for Milestone 1
+    # Choose a question selection strategy and create the engine once
+    strategy = RandomStrategy()
+    engine = AdaptiveEngine(strategy)
+
+    # Simple menu
     while True:
         print("\n=== TutorSpark CLI – Milestone 1 ===")
-        print("1. Start CS Fundamentals quiz session")
+        print("1. Start CS Fundamentals quest")
         print("2. Exit")
 
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
-            run_quiz_for_profile(profile)
+            run_quest_for_profile(engine, profile)
         elif choice == "2":
             print("Goodbye, and good luck with your studies!")
             break

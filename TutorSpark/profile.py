@@ -3,29 +3,31 @@ from __future__ import annotations
 from typing import List
 
 import db
+from hero_art import get_hero_art
 from models import LearnerProfile
 
-# === ANSI color constants ===
-RESET   = "\033[0m"
-BOLD    = "\033[1m"
+# === ANSI color constants ====================================================
 
-FG_BLACK   = "\033[30m"
-FG_RED     = "\033[31m"
-FG_GREEN   = "\033[32m"
-FG_YELLOW  = "\033[33m"
-FG_BLUE    = "\033[34m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
+
+FG_BLACK = "\033[30m"
+FG_RED = "\033[31m"
+FG_GREEN = "\033[32m"
+FG_YELLOW = "\033[33m"
+FG_BLUE = "\033[34m"
 FG_MAGENTA = "\033[35m"
-FG_CYAN    = "\033[36m"
-FG_WHITE   = "\033[37m"
+FG_CYAN = "\033[36m"
+FG_WHITE = "\033[37m"
 
-# Short aliases used in the rest of the file
-RED     = FG_RED
-GREEN   = FG_GREEN
-YELLOW  = FG_YELLOW
-BLUE    = FG_BLUE
+# Short aliases
+RED = FG_RED
+GREEN = FG_GREEN
+YELLOW = FG_YELLOW
+BLUE = FG_BLUE
 MAGENTA = FG_MAGENTA
-CYAN    = FG_CYAN
-WHITE   = FG_WHITE
+CYAN = FG_CYAN
+WHITE = FG_WHITE
 
 
 def color(text: str, *styles: str) -> str:
@@ -33,8 +35,6 @@ def color(text: str, *styles: str) -> str:
         return text
     return "".join(styles) + text + RESET
 
-
-# === Small text UI helpers ===================================================
 
 def _print_boxed(lines: List[str]) -> None:
     if not lines:
@@ -47,71 +47,11 @@ def _print_boxed(lines: List[str]) -> None:
     print(border)
 
 
-def _ascii_for_class(hero_class: str) -> str:
-    """
-    Returns a little ASCII hero graphic for the chosen class.
-    Kept small so it looks good in a terminal.
-    """
-    hc = hero_class.lower()
-
-    if hc == "warrior":
-        # Tiny knight with sword
-        return r"""
-          /> 
-         /<\ 
-        /^^^\ 
-       | 0 0 |
-       |_==_|__
-         /||\
-        /_||_\
-          /\
-         /  \
-        """
-
-    if hc == "mage":
-        # Robed caster with staff
-        return r"""
-           /\ 
-          /  \ 
-         / /\ \ 
-        /_/  \_\ 
-          (  )
-         /|/\|
-        /_||||\
-          /__\
-           /\
-        """
-
-    if hc == "healer":
-        # Heart + healing staff vibe
-        return r"""
-        .-''''-.
-       /  .-.  \
-      |  /   \  |
-      |  \___/  |
-       \       /
-        `-._.-'
-          ||
-        __||__
-       /  ++  \
-       \______/
-        """
-
-    # NEO PRO – techy terminal hero
-    return r"""
-        _____________
-       |  TUTORSPARK |
-       |-------------|
-       |  > _        |
-       |             |
-       |   CS  PRO   |
-       |_____________|
-           /|\
-          /_|_\
-        """
+# === Hero stories + art ======================================================
 
 
 def _hero_story(hero_class: str, name: str) -> None:
+    """Show big colored ASCII art plus a short lore box."""
     hc = hero_class.lower()
 
     if hc == "warrior":
@@ -121,7 +61,7 @@ def _hero_story(hero_class: str, name: str) -> None:
             "now stands ready to smash bugs and conquer basic CS monsters.",
             "High HP, forgiving difficulty – perfect for warming up.",
         ]
-        art_color = RED
+        box_color = RED
     elif hc == "mage":
         lines = [
             f"{name}, the {hero_class} of Algorithmia,",
@@ -129,7 +69,7 @@ def _hero_story(hero_class: str, name: str) -> None:
             "trading some defense for deeper insight and trickier battles.",
             "Balanced HP, strong hint magic.",
         ]
-        art_color = MAGENTA
+        box_color = MAGENTA
     elif hc == "healer":
         lines = [
             f"{name}, the {hero_class} of Debug Bay,",
@@ -137,7 +77,7 @@ def _hero_story(hero_class: str, name: str) -> None:
             "facing tougher foes but recovering from mistakes with grace.",
             "Lower HP, advanced questions – but powerful recovery tools.",
         ]
-        art_color = GREEN
+        box_color = GREEN
     else:  # NEO PRO
         lines = [
             f"{name}, the {hero_class} of Code Nexus,",
@@ -145,23 +85,22 @@ def _hero_story(hero_class: str, name: str) -> None:
             "seeks the toughest challenges with minimal lifelines.",
             "Lower HP, fewer assists – designed for advanced players.",
         ]
-        art_color = CYAN
+        box_color = CYAN
 
-    ascii_art = _ascii_for_class(hero_class)
+    ascii_art = get_hero_art(hero_class)
+    print("\n" + ascii_art + "\n")
 
-    # Show art first, then story box
-    print(color(ascii_art, art_color, BOLD))
+    print(color("", box_color), end="")
     _print_boxed(lines)
+    print(RESET, end="")
 
 
-def _choose_hero_class() -> str:
-    print()
-    print(color("Choose your hero class:", BOLD))
-    print(color("1) Warrior", RED), " – Beginner: high HP, more forgiving.")
-    print(color("2) Mage   ", MAGENTA), " – Intermediate: balanced HP, extra hint power.")
-    print(color("3) Healer ", GREEN), " – Advanced: trickier fights, but strong support skills.")
-    print(color("4) NEO PRO", CYAN), " – Expert: low HP, minimal lifelines, max challenge.")
+# === Hero selection ==========================================================
 
+def _choose_hero_class(name: str) -> str:
+    """
+    Let the player preview each class's avatar + story, then lock in.
+    """
     mapping = {
         "1": "Warrior",
         "2": "Mage",
@@ -170,10 +109,32 @@ def _choose_hero_class() -> str:
     }
 
     while True:
-        choice = input(color("Enter 1–4: ", YELLOW)).strip()
-        if choice in mapping:
-            return mapping[choice]
-        print(color("Invalid choice. Please enter 1, 2, 3, or 4.", RED))
+        print()
+        print(color("Choose your hero class:", BOLD))
+        print(color("1) Warrior ", RED), " – Beginner: high HP, more forgiving.")
+        print(color("2) Mage   ", MAGENTA), " – Intermediate: balanced HP, extra hint power.")
+        print(color("3) Healer ", GREEN), " – Advanced: trickier fights, but strong support skills.")
+        print(color("4) NEO PRO", CYAN), " – Expert: low HP, minimal lifelines, max challenge.")
+
+        choice = input(color("\nEnter 1–4 to preview your hero: ", YELLOW)).strip()
+        if choice not in mapping:
+            print(color("Invalid choice. Please enter 1, 2, 3, or 4.", RED))
+            continue
+
+        hero_class = mapping[choice]
+
+        # Show avatar + lore for this class
+        _hero_story(hero_class, name)
+
+        confirm = input(
+            color(
+                "\nLock in this hero? (Y to confirm, anything else to choose again): ",
+                YELLOW,
+            )
+        ).strip().lower()
+
+        if confirm == "y":
+            return hero_class
 
 
 def _default_level_for_class(hero_class: str) -> str:
@@ -187,18 +148,32 @@ def _default_level_for_class(hero_class: str) -> str:
     return "Expert"
 
 
+# Auto-focus per hero class
+HERO_FOCUS_MAP = {
+    "warrior": "CS Fundamentals (Beginner)",
+    "mage": "Algorithms & Problem Solving",
+    "healer": "Testing & Software Quality",
+    "neo pro": "Systems & Advanced CS",
+}
+
+
+def _focus_for_hero_class(hero_class: str) -> str:
+    return HERO_FOCUS_MAP.get(hero_class.lower(), "CS Fundamentals")
+
+
+# === Profile creation / loading =============================================
+
+
 def _create_new_profile() -> LearnerProfile:
     print(color("Welcome to TutorSpark CLI! Let's create your learner profile.\n", CYAN))
 
     name = input(color("Hero name: ", YELLOW)).strip() or "Learner"
-    hero_class = _choose_hero_class()
+    hero_class = _choose_hero_class(name)
     level = _default_level_for_class(hero_class)
 
-    focus = input(
-        color("Primary focus area (e.g., Python Basics, Data Structures): ", YELLOW)
-    ).strip()
-    if not focus:
-        focus = "Computer Science Fundamentals"
+    # No menu: focus is implied by hero class
+    focus = _focus_for_hero_class(hero_class)
+    print(color(f"\nYour training path: {focus}", CYAN))
 
     profile = LearnerProfile(
         id=None,
@@ -209,7 +184,6 @@ def _create_new_profile() -> LearnerProfile:
     )
     profile = db.insert_profile(profile)
 
-    _hero_story(hero_class, name)
     print(color(f"\nProfile created. Welcome, {name} the {hero_class}!", CYAN, BOLD))
     return profile
 
@@ -222,10 +196,8 @@ def load_or_create_profile() -> LearnerProfile:
     existing = db.load_single_profile()
 
     if existing is None:
-        # No save file yet – create a new hero.
         return _create_new_profile()
 
-    # We have an existing hero: offer Continue / New Game.
     print(color("\n=== TutorSpark Save Slot ===", BOLD))
     print(
         color(
@@ -238,6 +210,9 @@ def load_or_create_profile() -> LearnerProfile:
     while True:
         choice = input(color("Choose 1 or 2: ", YELLOW)).strip()
         if choice == "1":
+            # Make sure focus stays consistent with hero class if you tweak mapping later
+            if not existing.focus_area:
+                existing.focus_area = _focus_for_hero_class(existing.hero_class)
             print(
                 color(
                     f"\nWelcome back to TutorSpark CLI, {existing.name} "
