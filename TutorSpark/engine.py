@@ -263,8 +263,11 @@ def apply_fifty_fifty(q: Question, hidden: Set[int]) -> str:
     """
     50/50 lifeline: hide two wrong options.
     """
-    candidates = [i for i in range(len(q.options))
-                  if i != q.correct_index and i not in hidden]
+    candidates = [
+        i
+        for i in range(len(q.options))
+        if i != q.correct_index and i not in hidden
+    ]
     if len(candidates) <= 1:
         return "50/50 can’t eliminate any more options."
     to_hide = set(random.sample(candidates, k=min(2, len(candidates))))
@@ -292,6 +295,31 @@ def hero_stats(profile: LearnerProfile) -> Tuple[int, int, int, int, int, int]:
         return 16, 5, 2, 1, 0, 0
 
     return 20, 4, 3, 2, 1, 0
+
+
+# === Testable helpers for unit tests ========================================
+
+def evaluate_answer(question: Question, chosen_index: int, current_hp: int) -> tuple[bool, int]:
+    """
+    Compare chosen answer to the correct index and update HP.
+
+    Returns:
+        (is_correct, new_hp)
+
+    This is a small, pure function used by tests to validate answer logic
+    without running the full interactive battle loop.
+    """
+    is_correct = (chosen_index == question.correct_index)
+    if not is_correct:
+        current_hp -= 1
+    return is_correct, current_hp
+
+
+def is_game_over(current_hp: int, remaining_questions: int) -> bool:
+    """
+    Game ends when HP is zero (or below) OR when there are no questions left.
+    """
+    return current_hp <= 0 or remaining_questions <= 0
 
 
 # === Adaptive Engine ========================================================

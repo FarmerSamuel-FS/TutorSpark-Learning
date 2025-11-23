@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Optional, Set
+from typing import Iterable, List, Optional, Set
 
 from models import LearnerProfile, QuizSession
 
@@ -55,7 +55,7 @@ def init_db() -> None:
         """
     )
 
-    # NEW: track which questions each profile has already seen
+    # Track which questions each profile has already seen
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS seen_questions (
@@ -69,6 +69,25 @@ def init_db() -> None:
 
     conn.commit()
     conn.close()
+
+
+# --- Helper for handling created_at -----------------------------------------
+
+
+def _normalise_created_at(value) -> datetime:
+    """
+    Accepts either a datetime or an ISO8601 string and always returns datetime.
+    """
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, str):
+        try:
+            return datetime.fromisoformat(value)
+        except ValueError:
+            # Fallback: current time if the string is malformed
+            return datetime.utcnow()
+    # Fallback for anything unexpected
+    return datetime.utcnow()
 
 
 # --- Learner profile helpers -------------------------------------------------
@@ -96,7 +115,34 @@ def load_single_profile() -> Optional[LearnerProfile]:
     )
 
 
+def get_all_profiles() -> List[LearnerProfile]:
+    """
+    Return all learner profiles (used by tests and future features).
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM learner_profiles ORDER BY id ASC;")
+    rows = cur.fetchall()
+    conn.close()
+
+    profiles: List[LearnerProfile] = []
+    for row in rows:
+        profiles.append(
+            LearnerProfile(
+                id=row["id"],
+                name=row["name"],
+                level=row["level"],
+                focus_area=row["focus_area"],
+                hero_class=row["hero_class"],
+            )
+        )
+    return profiles
+
+
 def insert_profile(profile: LearnerProfile) -> LearnerProfile:
+    """
+    Original insert helper that returns the profile object with id set.
+    """
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
@@ -110,6 +156,14 @@ def insert_profile(profile: LearnerProfile) -> LearnerProfile:
     profile.id = cur.lastrowid
     conn.close()
     return profile
+
+
+def insert_learner_profile(profile: LearnerProfile) -> int:
+    """
+    Test-friendly wrapper: insert a profile and return the new integer id.
+    """
+    persisted = insert_profile(profile)
+    return persisted.id or 0
 
 
 def reset_all_data() -> None:
@@ -133,7 +187,16 @@ def reset_all_data() -> None:
 # --- Quiz session helpers ----------------------------------------------------
 
 
-def insert_quiz_session(session: QuizSession) -> QuizSession:
+def insert_quiz_session(session: QuizSession) -> int:
+    """
+    Insert a QuizSession and return the new integer session id.
+
+    NOTE: This is shaped to work both with the game engine and with
+    the pytest tests, which expect `insert_quiz_session(...)` to
+    return an int (the session id).
+    """
+    created_dt = _normalise_created_at(session.created_at)
+
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
@@ -146,13 +209,14 @@ def insert_quiz_session(session: QuizSession) -> QuizSession:
             session.topic,
             session.total_questions,
             session.correct_answers,
-            session.created_at.isoformat(),
+            created_dt.isoformat(),
         ),
     )
     conn.commit()
-    session.id = cur.lastrowid
+    new_id = cur.lastrowid
+    session.id = new_id
     conn.close()
-    return session
+    return new_id
 
 
 def count_quiz_sessions_for_profile(profile_id: int) -> int:
@@ -169,6 +233,46 @@ def count_quiz_sessions_for_profile(profile_id: int) -> int:
     row = cur.fetchone()
     conn.close()
     return int(row["c"] if row is not None else 0)
+
+
+def get_recent_quiz_sessions(limit: int = 10) -> List[QuizSession]:
+    """
+    Return the most recent quiz sessions across all profiles, newest first.
+    Used by tests to verify that stats are persisted correctly.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT id, profile_id, topic, total_questions, correct_answers, created_at
+        FROM quiz_sessions
+        ORDER BY created_at DESC
+        LIMIT ?;
+        """,
+        (limit,),
+    )
+    rows = cur.fetchall()
+    conn.close()
+
+    sessions: List[QuizSession] = []
+    for row in rows:
+        created_at_str = row["created_at"]
+        try:
+            created_dt = datetime.fromisoformat(created_at_str)
+        except ValueError:
+            created_dt = datetime.utcnow()
+
+        sessions.append(
+            QuizSession(
+                id=row["id"],
+                profile_id=row["profile_id"],
+                topic=row["topic"],
+                total_questions=row["total_questions"],
+                correct_answers=row["correct_answers"],
+                created_at=created_dt,
+            )
+        )
+    return sessions
 
 
 # --- Seen-questions helpers (for multi-level, no-repeat quizzes) ------------
