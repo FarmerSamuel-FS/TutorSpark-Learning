@@ -1,11 +1,20 @@
-# Python
+# Python bytecode / cache
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
 
-# PyInstaller
+# Virtual envs
+.env/
+.venv/
+venv/
+
+# macOS
+.DS_Store
+
+# PyInstaller artifacts
 build/
 dist/
 *.spec
 
-# Local DB
+# SQLite DB created at runtime
 TutorSpark/tutorspark.db
