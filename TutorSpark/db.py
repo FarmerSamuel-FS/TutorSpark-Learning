@@ -210,7 +210,7 @@ def insert_quiz_session(session: QuizSession) -> int:
             session.total_questions,
             session.correct_answers,
             created_dt.isoformat(),
-        ),
+              ),
     )
     conn.commit()
     new_id = cur.lastrowid
