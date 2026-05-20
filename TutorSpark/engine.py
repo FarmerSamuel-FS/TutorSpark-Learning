@@ -14,12 +14,14 @@ Core battle engine for TutorSpark CLI.
 
 import os
 import random
+import textwrap
 import time
 from datetime import datetime
 from typing import List, Set, Tuple
 
 import db
-from models import LearnerProfile, Question, QuizSession
+from models import LearnerProfile, Question, QuizSession, UsabilityEvent
+from quest_lore import build_battle_intro
 from strategies import QuestionSelectionStrategy
 
 # === Terminal styling / graphics helpers ====================================
@@ -50,12 +52,25 @@ def print_banner(title: str) -> None:
 def print_boxed(lines: List[str]) -> None:
     if not lines:
         return
-    width = max(len(line) for line in lines)
+    wrapped_lines: List[str] = []
+    for line in lines:
+        wrapped_lines.extend(textwrap.wrap(line, width=68) or [""])
+    width = max(len(line) for line in wrapped_lines)
     border = "+" + "-" * (width + 2) + "+"
     print("\n" + border)
-    for line in lines:
+    for line in wrapped_lines:
         print(f"| {line.ljust(width)} |")
     print(border)
+
+
+def print_guardrail_notice() -> None:
+    print_boxed(
+        [
+            "TutorSpark guardrails: supports reasoning before answers.",
+            "Use H for a concept hint, F to reduce choices, C for a suggestion.",
+            "The system logs support use and timing for usability review.",
+        ]
+    )
 
 
 def render_bar(current: int, maximum: int, length: int = 20, fill_char: str = "#") -> str:
@@ -226,6 +241,14 @@ def render_progress_bar(score_percent: float, length: int = 20) -> str:
 
 def enemy_name_for_topic(topic: str) -> str:
     topic_lower = topic.lower()
+    if any(key in topic_lower for key in ["arithmetic", "fraction", "geometry", "algebra", "data literacy"]):
+        return "Number Wraith"
+    if any(key in topic_lower for key in ["life science", "earth science", "physical science", "space science", "scientific method"]):
+        return "Lab Slime"
+    if any(key in topic_lower for key in ["u.s. history", "world history", "civics", "geography"]):
+        return "Timeline Phantom"
+    if any(key in topic_lower for key in ["digital literacy", "internet safety", "hardware", "software basics", "productivity"]):
+        return "Glitch Imp"
     if "algorithm" in topic_lower:
         return "Sorting Slime"
     if "data" in topic_lower:
@@ -256,6 +279,21 @@ def get_hint_for_question(q: Question) -> str:
     return _HINTS.get(
         q.id,
         "Think carefully about the core concept this question is testing.",
+    )
+
+
+def get_reflection_prompt(q: Question) -> str:
+    prompts = {
+        "Algorithms": "Which step in the algorithm changes the search space?",
+        "Data Structures": "What access pattern does the problem describe?",
+        "Programming Fundamentals": "Which language rule is the question testing?",
+        "Complexity": "How does the work grow as the input gets larger?",
+        "Software Engineering": "What behavior would help future developers trust the code?",
+        "Version Control": "Which action changes local history versus remote history?",
+    }
+    return prompts.get(
+        q.topic,
+        "What clue in the question points toward the correct concept?",
     )
 
 
@@ -341,6 +379,11 @@ class AdaptiveEngine:
         profile: LearnerProfile,
         question_bank: List[Question],
         limit: int = 10,
+        study_session_id: int | None = None,
+        quest_topic: str = "CS Questline",
+        quest_label: str | None = None,
+        subject_key: str = "cs_fundamentals",
+        tutoring_condition: str = "constrained",
     ) -> QuizSession:
         selected = self._selection_strategy.select_questions(
             question_bank,
@@ -352,12 +395,39 @@ class AdaptiveEngine:
         correct = 0
         current_streak = 0
         best_streak = 0
+        usability_events: List[UsabilityEvent] = []
+        condition = tutoring_condition if tutoring_condition in {"constrained", "unconstrained"} else "constrained"
+        support_enabled = condition == "constrained"
+
+        def record_event(
+            event_type: str,
+            detail: str,
+            question_id: int | None = None,
+            elapsed_seconds: float | None = None,
+            metadata: str | None = None,
+        ) -> None:
+            if profile.id is None:
+                return
+            usability_events.append(
+                UsabilityEvent(
+                    id=None,
+                    profile_id=profile.id,
+                    session_id=None,
+                    event_type=event_type,
+                    detail=detail,
+                    created_at=datetime.utcnow(),
+                    question_id=question_id,
+                    elapsed_seconds=elapsed_seconds,
+                    metadata=metadata,
+                    study_session_id=study_session_id,
+                )
+            )
 
         max_hp, damage_on_hit, hints_left, fifty_fifty_left, calls_left, free_passes = hero_stats(profile)
         hp = max_hp
 
         quest_number = get_quest_number(profile)
-        quest_title = get_quest_title(profile, quest_number)
+        quest_title = quest_label or get_quest_title(profile, quest_number)
 
         clear_screen()
         print_banner("TutorSpark Training Grounds")
@@ -370,6 +440,21 @@ class AdaptiveEngine:
             )
         )
         print(color(f"Starting HP: {render_bar(hp, max_hp, fill_char='❤')}", YELLOW))
+        if support_enabled:
+            print_guardrail_notice()
+        else:
+            print(
+                color(
+                    "Unconstrained run: answer directly. Hints, lifelines, and reflection prompts are hidden for comparison data.",
+                    CYAN,
+                )
+            )
+
+        record_event(
+            "quest_started",
+            f"quest={quest_number}; title={quest_title}; subject={quest_topic}; questions={total}; condition={condition}",
+            metadata=f"hero_class={profile.hero_class}; level={profile.level}; tutoring_condition={condition}",
+        )
 
         for idx, q in enumerate(selected, start=1):
             if hp <= 0:
@@ -380,19 +465,33 @@ class AdaptiveEngine:
             used_hint_this_question = False
             used_fifty_this_question = False
             used_friend_this_question = False
+            question_started_at = time.perf_counter()
 
             while True:
+                battle_intro = build_battle_intro(
+                    profile,
+                    subject_key,
+                    quest_title,
+                    q.topic,
+                    enemy_name,
+                    idx,
+                    total,
+                )
                 print("\n" + "-" * 70)
                 print(color(f"⚔️  Battle {idx}/{total}: A wild {enemy_name} appears!", BOLD))
                 print(color(f"Topic: {q.topic}", CYAN))
                 print(color(f"Path: {render_run_path(idx, total)}", CYAN))
                 print(color(f"HP: {render_bar(hp, max_hp, fill_char='❤')}", YELLOW))
-                print(
-                    f"Streak: {current_streak}   "
-                    f"Hints: {hints_left}   50/50: {fifty_fifty_left}   "
-                    f"Call: {calls_left}   Free passes: {free_passes}"
-                )
+                if support_enabled:
+                    print(
+                        f"Streak: {current_streak}   "
+                        f"Hints: {hints_left}   50/50: {fifty_fifty_left}   "
+                        f"Call: {calls_left}   Free passes: {free_passes}"
+                    )
+                else:
+                    print(f"Streak: {current_streak}   Support tools: unavailable in this condition")
                 print("-" * 70)
+                print_boxed([battle_intro])
                 print(q.prompt)
 
                 for opt_index, option in enumerate(q.options, start=1):
@@ -401,10 +500,13 @@ class AdaptiveEngine:
                     else:
                         print(f"  {opt_index}. {option}")
 
-                print(
-                    "\nChoose: 1–4 to answer, "
-                    "H=Hint, F=50/50, C=Call a friend, P=Free pass"
-                )
+                if support_enabled:
+                    print(
+                        "\nChoose: 1–4 to answer, "
+                        "H=Hint, F=50/50, C=Call a friend, P=Free pass"
+                    )
+                else:
+                    print("\nChoose: 1–4 to answer")
                 raw = input("Your move: ").strip().upper()
 
                 is_correct = False
@@ -414,11 +516,27 @@ class AdaptiveEngine:
                     answer_idx = int(raw) - 1
                     if answer_idx in hidden_indices:
                         print("That option has been eliminated. Pick another.")
+                        record_event(
+                            "guardrail_retry_prompted",
+                            "learner_selected_eliminated_option",
+                            question_id=q.id,
+                            elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                        )
                         continue
                     is_correct = (answer_idx == q.correct_index)
                     break
 
                 elif raw == "H":
+                    if not support_enabled:
+                        print("Hints are unavailable during this unconstrained study condition.")
+                        record_event(
+                            "support_unavailable",
+                            f"battle={idx}; requested=hint; condition={condition}",
+                            question_id=q.id,
+                            elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                            metadata=f"tutoring_condition={condition}",
+                        )
+                        continue
                     if hints_left <= 0:
                         print("You have no hints left.")
                         continue
@@ -428,10 +546,33 @@ class AdaptiveEngine:
                     hints_left -= 1
                     used_hint_this_question = True
                     hint_text = get_hint_for_question(q)
+                    record_event(
+                        "hint_used",
+                        f"battle={idx}",
+                        question_id=q.id,
+                        elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                        metadata=f"remaining_hints={hints_left}",
+                    )
                     print(color(f"Hint: {hint_text}", CYAN))
+                    print(
+                        color(
+                            "Guardrail check: try applying the hint before choosing an answer.",
+                            CYAN,
+                        )
+                    )
                     continue
 
                 elif raw == "F":
+                    if not support_enabled:
+                        print("50/50 is unavailable during this unconstrained study condition.")
+                        record_event(
+                            "support_unavailable",
+                            f"battle={idx}; requested=fifty_fifty; condition={condition}",
+                            question_id=q.id,
+                            elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                            metadata=f"tutoring_condition={condition}",
+                        )
+                        continue
                     if fifty_fifty_left <= 0:
                         print("You have no 50/50 lifelines left.")
                         continue
@@ -441,10 +582,27 @@ class AdaptiveEngine:
                     fifty_fifty_left -= 1
                     used_fifty_this_question = True
                     msg = apply_fifty_fifty(q, hidden_indices)
+                    record_event(
+                        "fifty_fifty_used",
+                        f"battle={idx}; hidden={sorted(hidden_indices)}",
+                        question_id=q.id,
+                        elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                        metadata=f"remaining_fifty_fifty={fifty_fifty_left}",
+                    )
                     print(color(msg, CYAN))
                     continue
 
                 elif raw == "C":
+                    if not support_enabled:
+                        print("Call a friend is unavailable during this unconstrained study condition.")
+                        record_event(
+                            "support_unavailable",
+                            f"battle={idx}; requested=call_friend; condition={condition}",
+                            question_id=q.id,
+                            elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                            metadata=f"tutoring_condition={condition}",
+                        )
+                        continue
                     if calls_left <= 0:
                         print("You have no calls left.")
                         continue
@@ -454,6 +612,13 @@ class AdaptiveEngine:
                     calls_left -= 1
                     used_friend_this_question = True
                     suggestion = friend_suggestion(q)
+                    record_event(
+                        "friend_call_used",
+                        f"battle={idx}; suggestion={suggestion + 1}",
+                        question_id=q.id,
+                        elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                        metadata=f"remaining_calls={calls_left}",
+                    )
                     print(
                         color(
                             f"📞 Your friend thinks the answer is option {suggestion + 1} "
@@ -464,6 +629,16 @@ class AdaptiveEngine:
                     continue
 
                 elif raw == "P":
+                    if not support_enabled:
+                        print("Free Pass is unavailable during this unconstrained study condition.")
+                        record_event(
+                            "support_unavailable",
+                            f"battle={idx}; requested=free_pass; condition={condition}",
+                            question_id=q.id,
+                            elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                            metadata=f"tutoring_condition={condition}",
+                        )
+                        continue
                     if free_passes <= 0:
                         print("You don't have any free passes yet. "
                               "Earn them by getting answer streaks of 3.")
@@ -471,14 +646,39 @@ class AdaptiveEngine:
                     free_passes -= 1
                     used_free_pass = True
                     is_correct = True
+                    record_event(
+                        "free_pass_used",
+                        f"battle={idx}",
+                        question_id=q.id,
+                        elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                        metadata=f"remaining_free_passes={free_passes}",
+                    )
                     print(color("You use a free pass and avoid taking damage!", GREEN))
                     break
 
                 else:
                     print("Invalid choice. Try again.")
+                    record_event(
+                        "guardrail_retry_prompted",
+                        f"invalid_input={raw or '<blank>'}",
+                        question_id=q.id,
+                        elapsed_seconds=round(time.perf_counter() - question_started_at, 2),
+                    )
                     continue
 
+            answer_elapsed = round(time.perf_counter() - question_started_at, 2)
             if is_correct:
+                record_event(
+                    "answer_submitted",
+                    f"battle={idx}; correct=true",
+                    question_id=q.id,
+                    elapsed_seconds=answer_elapsed,
+                    metadata=(
+                        f"hint_used={used_hint_this_question}; "
+                        f"fifty_fifty_used={used_fifty_this_question}; "
+                        f"friend_call_used={used_friend_this_question}"
+                    ),
+                )
                 print(color("✨ Correct! The enemy is defeated.", GREEN, BOLD))
                 correct += 1
 
@@ -496,6 +696,27 @@ class AdaptiveEngine:
                 else:
                     print("Your streak stays where it is thanks to the free pass.")
             else:
+                record_event(
+                    "answer_submitted",
+                    f"battle={idx}; correct=false",
+                    question_id=q.id,
+                    elapsed_seconds=answer_elapsed,
+                    metadata=(
+                        f"hint_used={used_hint_this_question}; "
+                        f"fifty_fifty_used={used_fifty_this_question}; "
+                        f"friend_call_used={used_friend_this_question}"
+                    ),
+                )
+                if support_enabled:
+                    reflection_prompt = get_reflection_prompt(q)
+                    record_event(
+                        "reflection_prompted",
+                        f"battle={idx}; prompt={reflection_prompt}",
+                        question_id=q.id,
+                        elapsed_seconds=answer_elapsed,
+                        metadata=f"tutoring_condition={condition}",
+                    )
+                    print(color(f"Reflection prompt: {reflection_prompt}", CYAN))
                 correct_answer = q.options[q.correct_index]
                 print(
                     color(
@@ -537,12 +758,32 @@ class AdaptiveEngine:
         session = QuizSession(
             id=None,
             profile_id=profile.id or 0,
-            topic=f"Quest {quest_number} – CS Questline",
+            topic=f"Quest {quest_number} - {quest_topic}",
             total_questions=total,
             correct_answers=correct,
             created_at=datetime.utcnow(),
         )
         db.insert_quiz_session(session)
+
+        if profile.id is not None:
+            record_event(
+                "quest_completed",
+                (
+                    f"score={correct}/{total}; grade={grade}; "
+                    f"best_streak={best_streak}; xp={xp_earned}"
+                ),
+                metadata=(
+                    f"tutoring_condition={condition}; "
+                    + (
+                        "guardrails=hint_before_answer,reflection_after_miss,invalid_input_retry"
+                        if support_enabled
+                        else "guardrails=none; support_tools=hidden"
+                    )
+                ),
+            )
+            for event in usability_events:
+                event.session_id = session.id
+            db.insert_usability_events(usability_events)
 
         if profile.id is not None and selected:
             db.mark_questions_seen(profile.id, [q.id for q in selected])

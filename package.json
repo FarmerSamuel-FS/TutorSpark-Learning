@@ -1,0 +1,14 @@
+{
+  "name": "tutorspark-learning",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "check:static": "node -e \"const fs=require('fs');const html=fs.readFileSync('docs/index.html','utf8');const match=html.match(/<script>([\\s\\S]*)<\\/script>/);if(!match)throw new Error('script not found');new Function(match[1]);console.log('static script parses');\""
+  },
+  "dependencies": {
+    "mongodb": "^6.16.0"
+  }
+}

@@ -1,0 +1,1563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TutorSpark Week 3 HCI Study</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #52616f;
+      --line: #d8e1e8;
+      --paper: #f6f8fb;
+      --accent: #0f766e;
+      --accent-dark: #115e59;
+      --good: #166534;
+      --bad: #991b1b;
+      --panel: #ffffff;
+      --gold: #f59e0b;
+      --violet: #7c3aed;
+      --blue: #2563eb;
+      --green: #15803d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      font-size: 18px;
+      line-height: 1.45;
+    }
+    header {
+      background: #111827;
+      color: #fff;
+      border-bottom: 1px solid var(--line);
+      padding: 22px 20px;
+    }
+    main {
+      width: min(960px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+    h1 { margin: 0; font-size: 30px; }
+    h2 { margin: 0 0 10px; font-size: 24px; }
+    p { margin: 8px 0; }
+    .muted { color: var(--muted); }
+    header .muted { color: #cbd5e1; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 16px 0 6px;
+    }
+    select, input {
+      width: 100%;
+      min-height: 54px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+    }
+    button, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 58px;
+      margin: 8px 0;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button:hover, .button:hover { background: var(--accent-dark); }
+    button.secondary { background: #334155; }
+    button.secondary:hover { background: #1e293b; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .lobby {
+      display: grid;
+      gap: 18px;
+    }
+    .welcome {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    .welcome-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .welcome-title {
+      margin: 0;
+      font-size: 38px;
+      line-height: 1.05;
+    }
+    .topic-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .topic-pill {
+      display: inline-flex;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #0c4a6e;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .welcome-stage {
+      min-height: 310px;
+      border-radius: 8px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .welcome-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,0.05), rgba(15,23,42,0.3));
+    }
+    .welcome-hero {
+      display: block;
+      position: absolute;
+      z-index: 1;
+      width: min(42vw, 280px);
+      height: min(28vw, 190px);
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center bottom;
+      image-rendering: pixelated;
+      left: 8%;
+      bottom: 4%;
+      filter: drop-shadow(0 10px 10px rgba(15, 23, 42, 0.3));
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin: 10px 0 18px;
+    }
+    .hero-card {
+      display: block;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #ffffff;
+      min-height: 250px;
+      cursor: pointer;
+    }
+    .hero-card input {
+      width: auto;
+      min-height: auto;
+      margin-right: 8px;
+    }
+    .hero-card:has(input:checked) {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+    }
+    .hero-card.warrior strong { color: var(--blue); }
+    .hero-card.mage strong { color: var(--violet); }
+    .hero-card.healer strong { color: var(--green); }
+    .hero-card.neo strong { color: #0f172a; }
+    .hero-art {
+      display: block;
+      width: 100%;
+      height: 150px;
+      margin: 8px 0;
+      padding: 10px;
+      background: #0f172a;
+      border-radius: 8px;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center bottom;
+      image-rendering: pixelated;
+    }
+    .quest-preview {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+    .battle-stage {
+      position: relative;
+      min-height: 430px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background-size: cover;
+      background-position: center;
+      margin: 14px 0;
+    }
+    .battle-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(15,23,42,0.1));
+      pointer-events: none;
+    }
+    .battle-sprite {
+      display: block;
+      position: absolute;
+      z-index: 1;
+      width: min(26vw, 220px);
+      height: min(22vw, 180px);
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center bottom;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 10px 10px rgba(15, 23, 42, 0.25));
+    }
+    .hero-sprite {
+      left: 15%;
+      bottom: 22%;
+    }
+    .enemy-sprite {
+      right: 15%;
+      bottom: 24%;
+    }
+    .battle-dialogue {
+      border: 3px solid #111827;
+      border-radius: 8px;
+      background: #fffdf3;
+      box-shadow: 0 4px 0 #111827;
+      padding: 14px 16px;
+      margin: 12px 0 18px;
+      color: #111827;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .story-scroll {
+      position: relative;
+      border: 4px solid #3b2f1d;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(120, 72, 28, 0.18), transparent 10%, transparent 90%, rgba(120, 72, 28, 0.18)),
+        #fff7dc;
+      box-shadow: 0 6px 0 #111827, inset 0 0 0 2px #f3d99b;
+      padding: 22px 24px;
+      margin: 18px 0 24px;
+      color: #1f2937;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .story-scroll::before,
+    .story-scroll::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      height: 8px;
+      border-radius: 999px;
+      background: #8b5e34;
+    }
+    .story-scroll::before { top: -8px; }
+    .story-scroll::after { bottom: -8px; }
+    .story-scroll h2 {
+      margin-top: 0;
+      font-family: inherit;
+      color: #3b2f1d;
+    }
+    .story-scroll p { margin-bottom: 0; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .menu-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+    .menu-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .stat-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 8px 0;
+    }
+    .stat-line:last-child { border-bottom: 0; }
+    .dojo-list {
+      display: grid;
+      gap: 12px;
+      padding: 0;
+      list-style: none;
+    }
+    .dojo-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      background: #fffdf5;
+    }
+    .dojo-answer {
+      margin-top: 8px;
+      color: var(--good);
+      font-weight: 700;
+    }
+    .ability-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .ability-bar button {
+      margin: 0;
+      min-height: 48px;
+      background: #334155;
+      font-size: 15px;
+    }
+    .ability-bar button:disabled,
+    .grid button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .battle-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .battle-pill {
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #0c4a6e;
+      padding: 6px 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .battle-pill.danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .hp-note {
+      margin: 4px 0 12px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .progress {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .dot {
+      height: 12px;
+      flex: 1;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+    .dot.done { background: var(--accent); }
+    .result-ok { color: var(--good); font-weight: 700; }
+    .result-miss { color: var(--bad); font-weight: 700; }
+    .hidden { display: none; }
+    .summary {
+      white-space: pre-wrap;
+      background: #eef6f4;
+      border: 1px solid #b7d7d1;
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    @media (max-width: 720px) {
+      body { font-size: 20px; }
+      h1 { font-size: 28px; }
+      main { padding: 14px; }
+      button, select, input { min-height: 62px; font-size: 20px; }
+      .welcome { grid-template-columns: 1fr; }
+      .welcome-title { font-size: 34px; }
+      .welcome-stage { min-height: 260px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TutorSpark</h1>
+    <p class="muted">An interactive RPG learning application for curious adventurers.</p>
+  </header>
+  <main>
+    <section id="start" class="lobby">
+      <div class="panel welcome">
+        <div class="welcome-copy">
+          <h2 class="welcome-title">Learn Through Quests, Battles, And Story Rewards</h2>
+          <p>
+            TutorSpark turns short learning quizzes into a retro RPG adventure.
+            Choose a hero, enter a subject quest, answer challenge prompts, and
+            unlock a custom story after the final survey.
+          </p>
+          <div class="topic-list">
+            <span class="topic-pill">Math</span>
+            <span class="topic-pill">Science</span>
+            <span class="topic-pill">History</span>
+            <span class="topic-pill">Tech</span>
+            <span class="topic-pill">Computer Knowledge</span>
+          </div>
+          <p class="muted">
+            Computer Knowledge includes the original TutorSpark CS quizzes:
+            algorithms, data structures, Python, software engineering, and version control.
+          </p>
+        </div>
+        <div class="welcome-stage" style="background-image: url('assets/scenes/scene_computer_knowledge_coding_dungeon_storybook.png')">
+          <span class="welcome-hero" style="background-image: url('assets/frames/heroes/warrior/hero_warrior_idle_frame.png')" aria-label="TutorSpark Warrior hero"></span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Create Or Load Your Hero</h2>
+        <p class="muted">
+          Enter a hero name before choosing a class. Returning heroes keep their
+          saved class and quest history when the same name is used again.
+        </p>
+        <label for="heroName">Hero name</label>
+        <input id="heroName" maxlength="40" autocomplete="off" placeholder="Type the exact returning hero name, or create a new one">
+        <p id="heroProfileStatus" class="muted"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Choose Your Hero</h2>
+        <p class="muted">
+          New heroes use the class selected here. If the hero name already exists,
+          TutorSpark loads that hero's saved class automatically.
+        </p>
+        <div class="hero-grid">
+          <label class="hero-card warrior">
+            <input type="radio" name="heroClass" value="Warrior" checked>
+            <strong>Warrior</strong>
+            <span class="hero-art" style="background-image: url('assets/frames/heroes/warrior/hero_warrior_idle_frame.png')" aria-label="Warrior hero sprite"></span>
+            <span>High HP, steady progress, built for brave first steps.</span>
+          </label>
+          <label class="hero-card mage">
+            <input type="radio" name="heroClass" value="Mage">
+            <strong>Mage</strong>
+            <span class="hero-art" style="background-image: url('assets/frames/heroes/mage/hero_mage_idle_frame.png')" aria-label="Mage hero sprite"></span>
+            <span>Extra insight, pattern power, and curious problem solving.</span>
+          </label>
+          <label class="hero-card healer">
+            <input type="radio" name="heroClass" value="Healer">
+            <strong>Healer</strong>
+            <span class="hero-art" style="background-image: url('assets/frames/heroes/healer/hero_healer_idle_frame.png')" aria-label="Healer hero sprite"></span>
+            <span>Calm support, recovery, and careful learning.</span>
+          </label>
+          <label class="hero-card neo">
+            <input type="radio" name="heroClass" value="NEO PRO">
+            <strong>NEO PRO</strong>
+            <span class="hero-art" style="background-image: url('assets/frames/heroes/neo/hero_neo_idle_frame.png')" aria-label="NEO PRO hero sprite"></span>
+            <span>Fast missions, fewer assists, maximum focus.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Public Leaderboard</h2>
+        <p class="muted">Hero names stay private on this welcome screen. Returning players load progress by typing the exact hero name above.</p>
+        <ol id="homeLeaderboardList"></ol>
+      </div>
+
+      <div id="heroMenu" class="panel hidden">
+        <h2 id="heroMenuTitle">Hero Menu</h2>
+        <p id="heroMenuMeta" class="muted"></p>
+        <div class="menu-grid">
+          <div class="menu-card"><strong>Start Subject Quiz</strong><span>Pick a category and begin a five-question RPG battle quest.</span></div>
+          <div class="menu-card"><strong>Dojo Practice Run</strong><span>Study the question pool with correct answers before starting the randomized battle.</span></div>
+          <div class="menu-card"><strong>View / Select User Profile</strong><span>Return to the welcome screen to load a different exact hero name or create a new hero.</span></div>
+          <div class="menu-card"><strong>Progress Report</strong><span id="heroProgressSummary"></span></div>
+          <div class="menu-card"><strong>Leaderboard</strong><span>Compare completed quest scores from saved heroes below.</span></div>
+          <div class="menu-card"><strong>Export Study CSV</strong><span>Use the final CSV download after a completed online test.</span></div>
+          <div class="menu-card"><strong>Week 3 Analysis Bundle</strong><span>Use the CLI/Pi option after collecting downloaded CSV files for the 3.7 write-up.</span></div>
+        </div>
+        <div id="heroStats"></div>
+        <h2>Leaderboard</h2>
+        <ol id="leaderboardList"></ol>
+      </div>
+
+      <div id="questPanel" class="panel hidden">
+      <h2>Dojo Practice Run</h2>
+      <label for="subject">Category and topic</label>
+      <select id="subject"></select>
+      <div class="quest-preview">
+        <strong>Dojo briefing:</strong>
+        Open the practice run to study the subject question pool with correct answers,
+        then begin a randomized five-question quest battle.
+      </div>
+      <button id="dojoBtn" class="secondary" type="button">Open Dojo Practice Run</button>
+      <button id="beginBtn" type="button">Begin Randomized Quest Battle</button>
+      </div>
+    </section>
+
+    <section id="dojo" class="panel hidden">
+      <h2 id="dojoTitle">Dojo Practice Run</h2>
+      <p id="dojoMeta" class="muted"></p>
+      <ol id="dojoList" class="dojo-list"></ol>
+      <button id="dojoBeginBtn" type="button">Begin Randomized Quest Battle</button>
+      <button id="dojoBackBtn" class="secondary" type="button">Back To Hero Menu</button>
+    </section>
+
+    <section id="quiz" class="panel hidden">
+      <p id="participantMeta" class="muted"></p>
+      <div id="battleStats" class="battle-stats"></div>
+      <div id="progress" class="progress"></div>
+      <h2 id="questionText"></h2>
+      <p id="feedback"></p>
+      <div id="hintBox" class="panel hidden"></div>
+      <div id="answers" class="grid"></div>
+      <div class="ability-bar">
+        <button id="hintBtn" class="secondary" type="button">Hint</button>
+        <button id="fiftyBtn" class="secondary" type="button">50/50</button>
+        <button id="callBtn" class="secondary" type="button">Call</button>
+        <button id="passBtn" class="secondary" type="button">Free Pass</button>
+      </div>
+    </section>
+
+    <section id="survey" class="panel hidden">
+      <h2>Quest Complete: Final Survey</h2>
+      <p class="muted">1 = strongly disagree, 5 = strongly agree</p>
+      <h2>Adventurer Feedback</h2>
+      <p class="muted">These final questions help us understand who tested TutorSpark. Do not enter names or private details.</p>
+      <label for="ageRange">Age range</label>
+      <select id="ageRange">
+        <option>under 18</option>
+        <option>18-24</option>
+        <option>25-34</option>
+        <option>35-44</option>
+        <option>45+</option>
+        <option>prefer not to say</option>
+      </select>
+      <label for="learningBackground">Learning background</label>
+      <select id="learningBackground">
+        <option>K-12</option>
+        <option>college</option>
+        <option>self-taught</option>
+        <option>professional</option>
+        <option>other</option>
+      </select>
+      <label for="csExperience">Computer/CS experience</label>
+      <select id="csExperience">
+        <option>none</option>
+        <option>beginner</option>
+        <option>intermediate</option>
+        <option>advanced</option>
+      </select>
+      <label for="device">Device used today</label>
+      <select id="device">
+        <option>phone</option>
+        <option>tablet</option>
+        <option>laptop</option>
+        <option>desktop</option>
+        <option>Raspberry Pi touchscreen</option>
+      </select>
+      <label for="accessibility">Accessibility notes</label>
+      <input id="accessibility" value="none">
+      <label for="openFeedback">Comments about TutorSpark</label>
+      <input id="openFeedback" value="none">
+      <label for="frustrationNotes">Anything confusing, frustrating, or hard to use?</label>
+      <input id="frustrationNotes" value="none">
+      <label for="positiveNotes">What did you like, or what worked well?</label>
+      <input id="positiveNotes" value="none">
+      <div id="surveyFields"></div>
+      <button id="submitSurveyBtn" type="button">Unlock Story Reward</button>
+    </section>
+
+    <section id="complete" class="panel hidden">
+      <h2>Study Complete</h2>
+      <p id="scoreLine"></p>
+      <p id="submitStatus" class="muted"></p>
+      <div id="storyGift"></div>
+      <p class="muted">Download the CSV and send it to the researcher/instructor using the collection method chosen for class.</p>
+      <button id="downloadBtn" type="button">Download My Study CSV</button>
+      <button id="restartBtn" class="secondary" type="button">Start Another Participant</button>
+      <h2>Summary</h2>
+      <pre id="summary" class="summary"></pre>
+    </section>
+  </main>
+
+  <script>
+    const categories = [
+      { key: "math", title: "Math", subjects: ["basic_math"] },
+      { key: "science", title: "Science", subjects: ["general_science"] },
+      { key: "history", title: "History", subjects: ["history_civics"] },
+      { key: "tech", title: "Tech", subjects: ["digital_literacy", "internet_safety"] },
+      { key: "computer_knowledge", title: "Computer Knowledge", subjects: ["cs_fundamentals", "algorithms_complexity", "data_structures", "python_programming", "software_engineering"] }
+    ];
+
+    const subjects = {
+      basic_math: { title: "Basic Math", topics: ["Arithmetic", "Fractions", "Geometry", "Algebra", "Data Literacy"] },
+      general_science: { title: "General Science", topics: ["Life Science", "Earth Science", "Physical Science", "Space Science", "Scientific Method"] },
+      history_civics: { title: "History & Civics", topics: ["U.S. History", "World History", "Civics", "Geography"] },
+      digital_literacy: { title: "Digital Literacy", topics: ["Digital Literacy", "Hardware Basics", "Software Basics", "Productivity Tools"] },
+      internet_safety: { title: "Internet Safety", topics: ["Internet Safety"] },
+      cs_fundamentals: { title: "CS Fundamentals", topics: ["Programming Fundamentals", "Python", "OOP", "Software Design", "Version Control"] },
+      algorithms_complexity: { title: "Algorithms & Complexity", topics: ["Algorithms", "Complexity"] },
+      data_structures: { title: "Data Structures", topics: ["Data Structures"] },
+      python_programming: { title: "Python Programming", topics: ["Programming Fundamentals", "Python", "OOP"] },
+      software_engineering: { title: "Software Engineering", topics: ["Software Engineering", "Software Testing", "Software Design", "Version Control"] }
+    };
+
+    const heroAssets = {
+      Warrior: {
+        idle: "assets/frames/heroes/warrior/hero_warrior_idle_frame.png",
+        attack: "assets/frames/heroes/warrior/hero_warrior_attack_frame.png",
+        hurt: "assets/frames/heroes/warrior/hero_warrior_hurt_frame.png",
+        victory: "assets/frames/heroes/warrior/hero_warrior_victory_frame.png"
+      },
+      Mage: {
+        idle: "assets/frames/heroes/mage/hero_mage_idle_frame.png",
+        attack: "assets/frames/heroes/mage/hero_mage_attack_frame.png",
+        hurt: "assets/frames/heroes/mage/hero_mage_hurt_frame.png",
+        victory: "assets/frames/heroes/mage/hero_mage_victory_frame.png"
+      },
+      Healer: {
+        idle: "assets/frames/heroes/healer/hero_healer_idle_frame.png",
+        attack: "assets/frames/heroes/healer/hero_healer_attack_frame.png",
+        hurt: "assets/frames/heroes/healer/hero_healer_hurt_frame.png",
+        victory: "assets/frames/heroes/healer/hero_healer_victory_frame.png"
+      },
+      "NEO PRO": {
+        idle: "assets/frames/heroes/neo/hero_neo_idle_frame.png",
+        attack: "assets/frames/heroes/neo/hero_neo_attack_frame.png",
+        hurt: "assets/frames/heroes/neo/hero_neo_hurt_frame.png",
+        victory: "assets/frames/heroes/neo/hero_neo_victory_frame.png"
+      }
+    };
+
+    const sceneAssets = {
+      basic_math: "assets/scenes/scene_math_numbergate_storybook.png",
+      general_science: "assets/scenes/scene_science_living_light_storybook.png",
+      history_civics: "assets/scenes/scene_history_archive_hall_storybook.png",
+      digital_literacy: "assets/scenes/scene_tech_signal_grid_storybook.png",
+      internet_safety: "assets/scenes/scene_tech_signal_grid_storybook.png",
+      cs_fundamentals: "assets/scenes/scene_computer_knowledge_coding_dungeon_storybook.png",
+      algorithms_complexity: "assets/scenes/scene_computer_knowledge_coding_dungeon_storybook.png",
+      data_structures: "assets/scenes/scene_computer_knowledge_coding_dungeon_storybook.png",
+      python_programming: "assets/scenes/scene_computer_knowledge_coding_dungeon_storybook.png",
+      software_engineering: "assets/scenes/scene_computer_knowledge_coding_dungeon_storybook.png"
+    };
+
+    const enemyAssets = {
+      "Number Wraith": "assets/frames/enemies/number_wraith/enemy_number_wraith_idle_frame.png",
+      "Lab Slime": "assets/frames/enemies/lab_slime/enemy_lab_slime_idle_frame.png",
+      "Timeline Phantom": "assets/frames/enemies/timeline_phantom/enemy_timeline_phantom_idle_frame.png",
+      "Glitch Imp": "assets/frames/enemies/glitch_imp/enemy_glitch_imp_idle_frame.png",
+      "Sorting Slime": "assets/frames/enemies/sorting_slime/enemy_sorting_slime_idle_frame.png",
+      "Queue Goblin": "assets/frames/enemies/queue_goblin/enemy_queue_goblin_idle_frame.png",
+      "Syntax Sprite": "assets/frames/enemies/syntax_sprite/enemy_syntax_sprite_idle_frame.png",
+      "Big-O Ogre": "assets/frames/enemies/big_o_ogre/enemy_big_o_ogre_idle_frame.png",
+      "Regression Wraith": "assets/frames/enemies/regression_wraith/enemy_regression_wraith_idle_frame.png",
+      "Merge Goblin": "assets/frames/enemies/merge_goblin/enemy_merge_goblin_idle_frame.png",
+      "Logic Gremlin": "assets/frames/enemies/logic_gremlin/enemy_logic_gremlin_idle_frame.png"
+    };
+
+    const topicEnemies = {
+      Arithmetic: "Number Wraith",
+      Fractions: "Number Wraith",
+      Geometry: "Number Wraith",
+      Algebra: "Number Wraith",
+      "Data Literacy": "Number Wraith",
+      "Life Science": "Lab Slime",
+      "Earth Science": "Lab Slime",
+      "Physical Science": "Lab Slime",
+      "Space Science": "Lab Slime",
+      "Scientific Method": "Lab Slime",
+      "U.S. History": "Timeline Phantom",
+      "World History": "Timeline Phantom",
+      Civics: "Timeline Phantom",
+      Geography: "Timeline Phantom",
+      "Digital Literacy": "Glitch Imp",
+      "Internet Safety": "Glitch Imp",
+      "Hardware Basics": "Glitch Imp",
+      "Software Basics": "Glitch Imp",
+      "Productivity Tools": "Glitch Imp",
+      Algorithms: "Sorting Slime",
+      "Data Structures": "Queue Goblin",
+      "Programming Fundamentals": "Syntax Sprite",
+      Python: "Syntax Sprite",
+      OOP: "Syntax Sprite",
+      Complexity: "Big-O Ogre",
+      "Software Engineering": "Regression Wraith",
+      "Software Testing": "Regression Wraith",
+      "Software Design": "Regression Wraith",
+      "Version Control": "Merge Goblin"
+    };
+
+    const heroQuestTitles = {
+      Warrior: {
+        basic_math: "Shield Count at Numbergate",
+        general_science: "The Trial of Living Light",
+        history_civics: "Banner Oath of the First Council",
+        digital_literacy: "The Device Armory Drill",
+        internet_safety: "Gatewatch Against False Links",
+        cs_fundamentals: "Training Grounds of Code",
+        algorithms_complexity: "The Path-Splitter Arena",
+        data_structures: "Vaults of Ordered Storage",
+        python_programming: "Syntax Sword Forms",
+        software_engineering: "The Refactor Keep"
+      },
+      Mage: {
+        basic_math: "Runes of Balance",
+        general_science: "Circle of Elements",
+        history_civics: "Chronicle Hall of Echoes",
+        digital_literacy: "The Signal Scriptorium",
+        internet_safety: "Wards of the Trusted Link",
+        cs_fundamentals: "First Spells of Code",
+        algorithms_complexity: "The Recursive Spiral",
+        data_structures: "Crystal Archives of Order",
+        python_programming: "Python Grimoire Trial",
+        software_engineering: "The Pattern Forge"
+      },
+      Healer: {
+        basic_math: "Clinic of Careful Counts",
+        general_science: "Garden of Cause and Cure",
+        history_civics: "Archive of Community Memory",
+        digital_literacy: "The Helpful Tools Ward",
+        internet_safety: "Sanctuary of Safe Signals",
+        cs_fundamentals: "Foundations of Clear Thinking",
+        algorithms_complexity: "Triage of Many Paths",
+        data_structures: "Shelves of Steady Order",
+        python_programming: "Remedy Scripts Lab",
+        software_engineering: "Regression Recovery Ward"
+      },
+      "NEO PRO": {
+        basic_math: "Quantum Count Protocol",
+        general_science: "Systems Scan of Matter",
+        history_civics: "Timeline Integrity Mission",
+        digital_literacy: "Interface Command Deck",
+        internet_safety: "Zero-Trust Link Sweep",
+        cs_fundamentals: "Core Logic Boot Sequence",
+        algorithms_complexity: "Optimization Grid Run",
+        data_structures: "Memory Array Deep Dive",
+        python_programming: "Runtime Command Trial",
+        software_engineering: "Production Readiness Run"
+      }
+    };
+
+    const heroMotifs = {
+      Warrior: {
+        role: "steadfast Warrior",
+        opening: "lifted a book-shaped shield and crossed the bright gate",
+        method: "met each challenge one step at a time, turning careful choices into steady progress",
+        ally: "The shield glowed whenever the path became clearer.",
+        gift: "a steel-marked quest badge"
+      },
+      Mage: {
+        role: "curious Mage",
+        opening: "opened a field journal of bright runes and followed the first spark of the trail",
+        method: "looked for patterns, tested ideas, and shaped each answer like a helpful spell",
+        ally: "The journal shimmered when a hidden pattern came into view.",
+        gift: "a page of glowing quest notes"
+      },
+      Healer: {
+        role: "patient Healer",
+        opening: "entered the study ward with a lantern of calm light",
+        method: "used each answer to restore clarity, confidence, and a little more courage",
+        ally: "The lantern warmed the room whenever a lesson started to make sense.",
+        gift: "a care-sealed quest record"
+      },
+      "NEO PRO": {
+        role: "focused NEO PRO",
+        opening: "activated the command deck and watched the mission map come alive",
+        method: "scanned each prompt, tested the options, and adjusted course with focus",
+        ally: "The visor flashed whenever the next route became easier to read.",
+        gift: "a mission-grade quest log"
+      }
+    };
+
+    const subjectStakes = {
+      basic_math: "At Numbergate, missing numbers had scattered across the stones, and the path forward opened only when the hero rebuilt the pattern.",
+      general_science: "In the Hall of Living Light, small discoveries powered the lamps that protected the village library.",
+      history_civics: "Inside the Archive of Echoes, old maps and community stories waited for someone to connect them with care.",
+      digital_literacy: "Across the Signal Grid, tools, screens, and messages needed a guide who could choose the right action.",
+      internet_safety: "At the Linkwatch Gate, safe choices kept the trail clear and helped future travelers avoid traps.",
+      cs_fundamentals: "In the Core Logic chamber, every clear idea helped the old machines wake up and work together.",
+      algorithms_complexity: "On the Path-Splitter floor, every decision changed the route, so the hero searched for the smartest way through.",
+      data_structures: "Deep in the Ordered Vaults, scattered treasures had to be stored where anyone could find them again.",
+      python_programming: "In the Python Lab, tiny commands became tools that could solve problems one line at a time.",
+      software_engineering: "At Refactor Keep, the hero repaired a working machine so it could stay strong for the next learner."
+    };
+
+    const subjectBattlePlaces = {
+      basic_math: "the Numbergate platform",
+      general_science: "the Hall of Living Light",
+      history_civics: "the Archive of Echoes",
+      digital_literacy: "the Signal Grid",
+      internet_safety: "the Linkwatch Gate",
+      cs_fundamentals: "the Core Logic chamber",
+      algorithms_complexity: "the Path-Splitter floor",
+      data_structures: "the Ordered Vaults",
+      python_programming: "the Python Lab",
+      software_engineering: "Refactor Keep"
+    };
+
+    const heroStats = {
+      Warrior: { maxHp: 24, damage: 3, hints: 4, fifty: 2, calls: 1, passes: 0 },
+      Mage: { maxHp: 20, damage: 4, hints: 5, fifty: 1, calls: 1, passes: 0 },
+      Healer: { maxHp: 18, damage: 3, hints: 3, fifty: 2, calls: 1, passes: 1 },
+      "NEO PRO": { maxHp: 16, damage: 5, hints: 2, fifty: 1, calls: 0, passes: 0 }
+    };
+
+    const heroBattleActions = {
+      Warrior: "steps forward, shield raised, ready to turn a careful answer into a brave strike",
+      Mage: "opens the rune journal, looking for the pattern hidden inside the challenge",
+      Healer: "lifts the calm lantern, ready to restore the path with a thoughtful choice",
+      "NEO PRO": "checks the visor display, scanning the prompt for the cleanest route ahead"
+    };
+
+    const enemyBattleScripts = {
+      "Number Wraith": "scatters glowing digits across the arena",
+      "Lab Slime": "bubbles beside the experiment table and blocks the next discovery",
+      "Timeline Phantom": "swirls through old maps and tries to blur the order of events",
+      "Glitch Imp": "scrambles the signal panels with a burst of static",
+      "Sorting Slime": "splits the path into messy routes that need a clear method",
+      "Queue Goblin": "jumbles the waiting line of clues out of order",
+      "Syntax Sprite": "darts around the code runes, hiding one important detail",
+      "Big-O Ogre": "stomps onto the grid and challenges the hero to find the efficient path",
+      "Regression Wraith": "shakes the repaired machine, testing whether the fix still holds",
+      "Merge Goblin": "slides two paths together and dares the hero to keep the history clear",
+      "Logic Gremlin": "twists the logic gate and waits for a precise answer"
+    };
+
+    const questions = [
+      q(1, "Algorithms", "Which algorithm uses divide-and-conquer to search a sorted list by repeatedly halving the search space?", ["Linear search", "Binary search", "Depth-first search", "Breadth-first search"], 1),
+      q(2, "Data Structures", "Which data structure best models customers lining up at a bank counter?", ["Stack", "Queue", "Binary tree", "Hash map"], 1),
+      q(3, "Programming Fundamentals", "In Python, which keyword is used to define a function?", ["func", "define", "def", "fn"], 2),
+      q(4, "Complexity", "Which time complexity grows slightly faster than linear but slower than quadratic?", ["O(1)", "O(n)", "O(n log n)", "O(n^2)"], 2),
+      q(5, "Software Engineering", "What is a primary purpose of unit tests?", ["To replace documentation", "To describe expected behavior and catch regressions", "To speed up the compiler", "To store application logs"], 1),
+      q(6, "Version Control", "In Git, which command records a snapshot of your changes to the local repository?", ["git status", "git push", "git commit", "git reset"], 2),
+      q(8, "Data Structures", "Which data structure is commonly compared to a stack of plates on a table?", ["Queue", "Stack", "Graph", "Linked list"], 1),
+      q(9, "Programming Fundamentals", "Which of these is a Boolean literal in Python?", ["yes", "True", "TRUE", "1"], 1),
+      q(10, "OOP", "Which OOP principle is mainly about hiding internal state and exposing a controlled interface?", ["Inheritance", "Polymorphism", "Encapsulation", "Abstraction"], 2),
+      q(14, "Software Testing", "Which type of testing focuses on the smallest testable parts of an application?", ["Integration testing", "System testing", "Unit testing", "Acceptance testing"], 2),
+      q(26, "Arithmetic", "What is 18 + 27?", ["35", "45", "46", "55"], 1),
+      q(27, "Arithmetic", "What is 9 x 6?", ["42", "48", "54", "63"], 2),
+      q(28, "Fractions", "Which fraction is equal to 0.5?", ["1/4", "1/3", "1/2", "2/3"], 2),
+      q(29, "Geometry", "How many sides does a hexagon have?", ["5", "6", "7", "8"], 1),
+      q(30, "Algebra", "If x + 4 = 10, what is x?", ["4", "5", "6", "14"], 2),
+      q(31, "Data Literacy", "A bar chart is most useful for comparing:", ["Categories", "Chemical formulas", "Computer passwords", "Keyboard shortcuts"], 0),
+      q(32, "Life Science", "Which part of a plant is mainly responsible for photosynthesis?", ["Root", "Stem", "Leaf", "Flower petal"], 2),
+      q(33, "Earth Science", "Which layer of Earth do people live on?", ["Inner core", "Outer core", "Mantle", "Crust"], 3),
+      q(34, "Physical Science", "Water freezes at what temperature on the Celsius scale?", ["0 degrees", "32 degrees", "50 degrees", "100 degrees"], 0),
+      q(35, "Space Science", "Which object is at the center of our solar system?", ["Earth", "The Moon", "The Sun", "Mars"], 2),
+      q(36, "Scientific Method", "A testable explanation in science is called a:", ["Hypothesis", "Conclusion", "Measurement", "Variable"], 0),
+      q(38, "U.S. History", "Who was the first president of the United States?", ["Thomas Jefferson", "George Washington", "Abraham Lincoln", "John Adams"], 1),
+      q(39, "World History", "Ancient Egypt developed along which major river?", ["Amazon", "Nile", "Mississippi", "Danube"], 1),
+      q(40, "Civics", "In the U.S. government, which branch makes federal laws?", ["Executive", "Judicial", "Legislative", "Military"], 2),
+      q(41, "Geography", "Which continent is Brazil located in?", ["Africa", "South America", "Europe", "Asia"], 1),
+      q(44, "Digital Literacy", "What is a strong password most likely to include?", ["Only your first name", "A short common word", "A mix of letters, numbers, and symbols", "Your birthday only"], 2),
+      q(45, "Internet Safety", "What should you do before clicking a suspicious link in an email?", ["Click it quickly", "Forward it to everyone", "Check the sender and link destination", "Reply with your password"], 2),
+      q(46, "Hardware Basics", "Which computer part is often called the brain of the computer?", ["CPU", "Monitor", "Keyboard", "Printer"], 0),
+      q(47, "Software Basics", "Which of these is an operating system?", ["Python", "Windows", "HTML", "USB"], 1),
+      q(48, "Productivity Tools", "Which tool is best for organizing rows and columns of data?", ["Spreadsheet", "Photo editor", "Web browser", "Video player"], 0),
+      q(49, "Internet Safety", "Two-factor authentication improves security by requiring:", ["A second proof of identity", "A shorter password", "No login at all", "Public Wi-Fi only"], 0),
+      q(50, "Arithmetic", "What is 72 divided by 8?", ["6", "8", "9", "12"], 2),
+      q(51, "Arithmetic", "What is 14 + 19?", ["23", "31", "33", "39"], 2),
+      q(52, "Fractions", "Which fraction is larger?", ["1/5", "1/4", "1/8", "1/10"], 1),
+      q(53, "Geometry", "A right angle measures how many degrees?", ["45", "90", "120", "180"], 1),
+      q(54, "Algebra", "If 3x = 15, what is x?", ["3", "5", "12", "18"], 1),
+      q(55, "Data Literacy", "The average of 2, 4, and 6 is:", ["3", "4", "6", "12"], 1),
+      q(56, "Life Science", "Which body system moves blood through the body?", ["Digestive system", "Circulatory system", "Skeletal system", "Nervous system"], 1),
+      q(57, "Earth Science", "Weather describes conditions in the atmosphere over:", ["A short time", "Millions of years", "Only oceans", "Only mountains"], 0),
+      q(58, "Physical Science", "A magnet is most likely to attract:", ["Wood", "Plastic", "Iron", "Glass"], 2),
+      q(59, "Space Science", "Earth takes about how long to orbit the Sun once?", ["One day", "One month", "One year", "Ten years"], 2),
+      q(60, "Scientific Method", "In an experiment, the variable you change on purpose is the:", ["Independent variable", "Conclusion", "Control group", "Observation"], 0),
+      q(61, "U.S. History", "The U.S. Constitution begins with which phrase?", ["We the People", "Four score", "I have a dream", "Give me liberty"], 0),
+      q(62, "World History", "The Great Wall is strongly associated with which country?", ["India", "China", "Greece", "Mexico"], 1),
+      q(63, "Civics", "Voting is one way citizens can:", ["Participate in government", "Avoid all laws", "Skip taxes", "Replace courts"], 0),
+      q(64, "Geography", "Which is the largest ocean on Earth?", ["Atlantic", "Indian", "Pacific", "Arctic"], 2),
+      q(65, "U.S. History", "The Civil Rights Movement worked to expand:", ["Equal rights", "Ocean travel", "Space mining", "Currency printing"], 0),
+      q(66, "Digital Literacy", "A file saved in the cloud is stored:", ["Only on paper", "On remote internet-connected servers", "Inside a keyboard", "Only on a monitor"], 1),
+      q(67, "Hardware Basics", "Which device is used to display visual output from a computer?", ["Monitor", "Mouse", "Router", "Microphone"], 0),
+      q(68, "Software Basics", "An app is an example of:", ["Hardware", "Software", "Electricity", "A cable"], 1),
+      q(69, "Productivity Tools", "Which tool is commonly used to write and format documents?", ["Word processor", "Router", "Graphics card", "Power supply"], 0),
+      q(70, "Internet Safety", "Phishing messages often try to make users:", ["Think carefully", "Share private information", "Update good notes", "Read a textbook"], 1),
+      q(71, "Algorithms", "An algorithm is best described as:", ["A random guess", "A step-by-step procedure", "Only a computer part", "A type of cable"], 1),
+      q(72, "Complexity", "O(1) time means the work stays roughly the same as input size:", ["Grows", "Shrinks", "Stays constant", "Becomes impossible"], 2),
+      q(73, "Data Structures", "A linked list stores items using nodes that point to:", ["The next node", "Only the first node", "A web browser", "A compiler"], 0),
+      q(74, "Python", "Which Python collection stores key-value pairs?", ["List", "Tuple", "Dictionary", "String"], 2),
+      q(75, "Software Testing", "A regression test helps check that old behavior:", ["Still works after changes", "Is deleted immediately", "Never needs testing", "Only runs on paper"], 0)
+    ];
+
+    const hints = {
+      1: "Think divide-and-conquer: you keep halving the search space.",
+      2: "Customers line up first-in, first-out.",
+      3: "It is a three-letter Python keyword.",
+      4: "Pick the answer that includes both n and log n.",
+      5: "Good tests describe expected behavior and catch future mistakes.",
+      6: "This command records a local snapshot.",
+      26: "Break it apart: 18 + 20, then add 7.",
+      27: "Nine groups of six equals fifty-four.",
+      28: "One half is the same as 0.5.",
+      32: "Leaves collect sunlight for the plant.",
+      44: "Strong passwords are harder to guess when they mix character types.",
+      45: "Pause and verify before you click."
+    };
+
+    const surveyPrompts = [
+      ["interface_clarity", "The interface was easy to understand."],
+      ["support_helpfulness", "The hints and support tools helped me reason through the answers."],
+      ["cognitive_load", "The tutoring flow felt manageable and not overwhelming."],
+      ["trust", "I trusted the tutoring feedback during the session."],
+      ["touch_readiness", "The controls and prompts would work well on a touchscreen."],
+      ["topic_fit", "The subject/category choices matched what I expected to study."],
+      ["engagement_level", "The quest kept me engaged during the session."],
+      ["tutoring_effectiveness", "The tutoring condition helped me understand the material."],
+      ["interaction_quality", "The interaction quality felt smooth and useful."]
+    ];
+
+    let state = null;
+    const HERO_STORE_KEY = "tutorspark.heroProfiles.v1";
+
+    function q(id, topic, prompt, options, correctIndex) {
+      return { id, topic, prompt, options, correctIndex };
+    }
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function show(id) {
+      for (const section of ["start", "dojo", "quiz", "survey", "complete"]) {
+        byId(section).classList.toggle("hidden", section !== id);
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function shuffle(items) {
+      return [...items].sort(() => Math.random() - 0.5);
+    }
+
+    function nowIso() {
+      return new Date().toISOString();
+    }
+
+    function csvEscape(value) {
+      const text = String(value ?? "");
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function normalizeHeroName(name) {
+      return name.trim().replace(/\s+/g, " ");
+    }
+
+    function heroKey(name) {
+      return normalizeHeroName(name).toLowerCase();
+    }
+
+    function loadHeroProfiles() {
+      try {
+        return JSON.parse(localStorage.getItem(HERO_STORE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveHeroProfiles(profiles) {
+      localStorage.setItem(HERO_STORE_KEY, JSON.stringify(profiles));
+    }
+
+    function getStoredHero(name) {
+      return loadHeroProfiles()[heroKey(name)] || null;
+    }
+
+    function refreshHeroProfileStatus() {
+      const name = normalizeHeroName(byId("heroName").value);
+      const status = byId("heroProfileStatus");
+      if (!name) {
+        status.textContent = "Create a new hero name or type a returning hero name.";
+        byId("heroMenu").classList.add("hidden");
+        byId("questPanel").classList.add("hidden");
+        renderHomeLists();
+        return;
+      }
+      const existing = getStoredHero(name);
+      const selectedHeroClass = document.querySelector("input[name='heroClass']:checked").value;
+      if (existing) {
+        status.textContent = `Loaded ${existing.name}'s progress. This quest will use the selected ${selectedHeroClass}. Previous quests: ${existing.questCount || 0}. Best score: ${existing.bestScore || "not recorded yet"}.`;
+        renderHeroMenu({
+          ...existing,
+          heroClass: selectedHeroClass
+        });
+        return;
+      }
+      status.textContent = `${name} will be created as a new hero.`;
+      renderHeroMenu({
+        name,
+        heroClass: selectedHeroClass,
+        questCount: 0,
+        bestScore: "",
+        lastScore: "",
+        lastQuest: ""
+      });
+    }
+
+    function renderHeroMenu(profile) {
+      const menu = byId("heroMenu");
+      menu.classList.remove("hidden");
+      byId("questPanel").classList.remove("hidden");
+      byId("heroMenuTitle").textContent = `${profile.name}'s Hero Menu`;
+      byId("heroMenuMeta").textContent = `${profile.name} the ${profile.heroClass} | CLI-style menu adapted for touch and web testing.`;
+      byId("heroProgressSummary").textContent = `${profile.questCount || 0} sessions | Last ${profile.lastScore || "not recorded"} | Best ${profile.bestScore || "not recorded"}`;
+      byId("heroStats").innerHTML = [
+        ["Last quest", profile.lastQuest || "No completed quest yet"],
+        ["Last subject", profile.lastSubject || "No subject completed yet"],
+        ["Quest count", profile.questCount || 0],
+        ["Best score", profile.bestScore || "not recorded"]
+      ].map(([label, value]) => `<div class="stat-line"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard() {
+      const profiles = Object.values(loadHeroProfiles());
+      const ranked = profiles.sort((a, b) => scoreRatio(b.bestScore) - scoreRatio(a.bestScore));
+      const privateLeaderboardHtml = ranked.length
+        ? ranked.slice(0, 5).map(profile => `<li>${escapeHtml(profile.name)} the ${escapeHtml(profile.heroClass)} | Best ${escapeHtml(profile.bestScore || "not recorded")} | Sessions ${profile.questCount || 0}</li>`).join("")
+        : "<li>No leaderboard data yet.</li>";
+      const publicLeaderboardHtml = ranked.length
+        ? ranked.slice(0, 5).map(profile => `<li>${escapeHtml(profile.heroClass)} hero | Best ${escapeHtml(profile.bestScore || "not recorded")} | Sessions ${profile.questCount || 0}</li>`).join("")
+        : "<li>No leaderboard data yet.</li>";
+      byId("leaderboardList").innerHTML = privateLeaderboardHtml;
+      byId("homeLeaderboardList").innerHTML = publicLeaderboardHtml;
+    }
+
+    function renderHomeLists() {
+      renderLeaderboard();
+    }
+
+    function scoreRatio(scoreText) {
+      if (!scoreText) return 0;
+      const [correct, total] = scoreText.split("/").map(Number);
+      return total ? correct / total : 0;
+    }
+
+    function setupSubjects() {
+      const select = byId("subject");
+      for (const category of categories) {
+        for (const subjectKey of category.subjects) {
+          const option = document.createElement("option");
+          option.value = subjectKey;
+          option.textContent = `${category.title} - ${subjects[subjectKey].title}`;
+          select.appendChild(option);
+        }
+      }
+    }
+
+    function setupSurvey() {
+      const target = byId("surveyFields");
+      target.innerHTML = "";
+      for (const [key, prompt] of surveyPrompts) {
+        const label = document.createElement("label");
+        label.htmlFor = key;
+        label.textContent = prompt;
+        const select = document.createElement("select");
+        select.id = key;
+        select.name = key;
+        for (let value = 1; value <= 5; value += 1) {
+          const option = document.createElement("option");
+          option.value = String(value);
+          option.textContent = String(value);
+          select.appendChild(option);
+        }
+        select.value = "3";
+        target.append(label, select);
+      }
+    }
+
+    function openDojoPractice() {
+      const heroName = normalizeHeroName(byId("heroName").value);
+      if (!heroName) {
+        byId("heroProfileStatus").textContent = "Please enter a hero name before opening the Dojo Practice Run.";
+        byId("heroName").focus();
+        return;
+      }
+      const subjectKey = byId("subject").value;
+      const subject = subjects[subjectKey];
+      const pool = questions.filter(question => subject.topics.includes(question.topic));
+      byId("dojoTitle").textContent = `Dojo Practice Run: ${subject.title}`;
+      byId("dojoMeta").textContent = `${heroName} can study the full question pool here. The quest battle still draws a randomized five-question set.`;
+      byId("dojoList").innerHTML = pool.length
+        ? pool.map((question, index) => `<li class="dojo-card"><strong>${index + 1}. ${escapeHtml(question.topic)}</strong><p>${escapeHtml(question.prompt)}</p><div class="dojo-answer">Correct answer: ${escapeHtml(question.options[question.correctIndex])}</div></li>`).join("")
+        : "<li>No practice questions available for this subject yet.</li>";
+      show("dojo");
+    }
+
+    function beginStudy() {
+      const heroName = normalizeHeroName(byId("heroName").value);
+      if (!heroName) {
+        byId("heroProfileStatus").textContent = "Please enter a hero name before beginning the quest.";
+        byId("heroName").focus();
+        return;
+      }
+      const subjectKey = byId("subject").value;
+      const subject = subjects[subjectKey];
+      const profiles = loadHeroProfiles();
+      const existingProfile = profiles[heroKey(heroName)] || null;
+      const heroClass = document.querySelector("input[name='heroClass']:checked").value;
+      const questTitle = heroQuestTitles[heroClass][subjectKey] || subject.title;
+      const pool = questions.filter(question => subject.topics.includes(question.topic));
+      const selected = shuffle(pool).slice(0, Math.min(5, pool.length));
+      const participantCode = existingProfile ? existingProfile.participantCode : `P-${Date.now().toString().slice(-6)}`;
+      const stats = heroStats[heroClass] || heroStats.Warrior;
+      state = {
+        participantCode,
+        heroName,
+        heroClass,
+        profileStatus: existingProfile ? "loaded" : "created",
+        previousQuestCount: existingProfile ? existingProfile.questCount || 0 : 0,
+        questTitle,
+        heroAssets: heroAssets[heroClass],
+        sceneAsset: sceneAssets[subjectKey],
+        subjectKey,
+        subjectTitle: subject.title,
+        demographics: {},
+        questions: selected,
+        index: 0,
+        correct: 0,
+        hp: stats.maxHp,
+        maxHp: stats.maxHp,
+        damage: stats.damage,
+        hintsLeft: stats.hints,
+        fiftyLeft: stats.fifty,
+        callsLeft: stats.calls,
+        freePasses: stats.passes,
+        streak: 0,
+        hiddenIndices: [],
+        usedHint: false,
+        usedFifty: false,
+        usedFriend: false,
+        events: [],
+        survey: [],
+        startedAt: nowIso(),
+        questionStartedAt: performance.now()
+      };
+      state.events.push(eventRow("study_started", `subject=${state.subjectTitle}; hero=${heroClass}; hero_name=${heroName}; profile=${state.profileStatus}; quest=${questTitle}`));
+      renderQuestion();
+      show("quiz");
+    }
+
+    function eventRow(eventType, detail, question = null, elapsed = "") {
+      return {
+        participant_code: state.participantCode,
+        event_type: eventType,
+        detail,
+        question_id: question ? question.id : "",
+        question_topic: question ? question.topic : "",
+        elapsed_seconds: elapsed,
+        created_at: nowIso()
+      };
+    }
+
+    function renderQuestion() {
+      const question = state.questions[state.index];
+      const enemyName = topicEnemies[question.topic] || "Logic Gremlin";
+      const enemyAsset = enemyAssets[enemyName];
+      const missesLeft = missesRemaining();
+      const hpWarning = hpWarningText();
+      byId("participantMeta").textContent = `${state.heroName} | ${state.participantCode} | ${state.heroClass} Quest: ${state.questTitle} | Question ${state.index + 1} of ${state.questions.length}`;
+      byId("battleStats").innerHTML = [
+        { text: `HP ${state.hp}/${state.maxHp}` },
+        { text: `Misses Left ${missesLeft}`, danger: missesLeft <= 1 },
+        { text: `Streak ${state.streak}` },
+        { text: `Hints ${state.hintsLeft}` },
+        { text: `50/50 ${state.fiftyLeft}` },
+        { text: `Calls ${state.callsLeft}` },
+        { text: `Passes ${state.freePasses}` }
+      ].map(item => `<span class="battle-pill${item.danger ? " danger" : ""}">${item.text}</span>`).join("");
+      let hpNote = document.getElementById("hpNote");
+      if (!hpNote) {
+        hpNote = document.createElement("p");
+        hpNote.id = "hpNote";
+        hpNote.className = "hp-note";
+        byId("battleStats").after(hpNote);
+      }
+      hpNote.textContent = hpWarning;
+      byId("questionText").textContent = question.prompt;
+      byId("feedback").textContent = state.feedback || "";
+      byId("feedback").className = state.feedbackType || "";
+      byId("hintBox").classList.add("hidden");
+      byId("hintBox").textContent = "";
+
+      const progress = byId("progress");
+      progress.innerHTML = "";
+      for (let i = 0; i < state.questions.length; i += 1) {
+        const dot = document.createElement("span");
+        dot.className = `dot ${i <= state.index ? "done" : ""}`;
+        progress.appendChild(dot);
+      }
+
+      const answers = byId("answers");
+      answers.innerHTML = "";
+      let stage = document.getElementById("battleStage");
+      if (!stage) {
+        stage = document.createElement("div");
+        stage.id = "battleStage";
+        stage.className = "battle-stage";
+        byId("questionText").before(stage);
+      }
+      stage.style.backgroundImage = `url('${state.sceneAsset}')`;
+      stage.innerHTML = `
+        <span class="battle-sprite hero-sprite" style="background-image: url('${state.heroAssets.idle}')" aria-label="${state.heroClass} hero"></span>
+        <span class="battle-sprite enemy-sprite" style="background-image: url('${enemyAsset}')" aria-label="${enemyName} enemy"></span>
+      `;
+      let dialogue = document.getElementById("battleDialogue");
+      if (!dialogue) {
+        dialogue = document.createElement("div");
+        dialogue.id = "battleDialogue";
+        dialogue.className = "battle-dialogue";
+        stage.after(dialogue);
+      }
+      dialogue.textContent = buildBattleIntro(question, enemyName);
+      question.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        const eliminated = state.hiddenIndices.includes(index);
+        button.textContent = eliminated ? "[eliminated]" : option;
+        button.disabled = eliminated;
+        button.addEventListener("click", () => answerQuestion(index));
+        answers.appendChild(button);
+      });
+      byId("hintBtn").textContent = `Hint (${state.hintsLeft})`;
+      byId("hintBtn").disabled = state.hintsLeft <= 0 || state.usedHint;
+      byId("fiftyBtn").textContent = `50/50 (${state.fiftyLeft})`;
+      byId("fiftyBtn").disabled = state.fiftyLeft <= 0 || state.usedFifty;
+      byId("callBtn").textContent = `Call (${state.callsLeft})`;
+      byId("callBtn").disabled = state.callsLeft <= 0 || state.usedFriend;
+      byId("passBtn").textContent = `Free Pass (${state.freePasses})`;
+      byId("passBtn").disabled = state.freePasses <= 0;
+      state.questionStartedAt = performance.now();
+    }
+
+    function buildBattleIntro(question, enemyName) {
+      const place = subjectBattlePlaces[state.subjectKey] || "the quest arena";
+      const enemyAction = enemyBattleScripts[enemyName] || "guards the next clue and waits for a careful answer";
+      const heroAction = heroBattleActions[state.heroClass] || heroBattleActions.Warrior;
+      return `Encounter ${state.index + 1} of ${state.questions.length}: During ${state.questTitle}, ${state.heroName} enters ${place}. A ${enemyName} ${enemyAction}. ${state.heroName} ${heroAction}. This ${question.topic} challenge decides whether the path opens.`;
+    }
+
+    function missesRemaining() {
+      if (state.hp <= 0) return 0;
+      return Math.max(1, Math.ceil(state.hp / state.damage));
+    }
+
+    function hpWarningText() {
+      const missesLeft = missesRemaining();
+      if (missesLeft <= 0) return "HP is empty. The quest run is over.";
+      if (missesLeft === 1) return "Danger: the next missed answer ends this quest run.";
+      return `${missesLeft} missed answers left before HP runs out.`;
+    }
+
+    function answerQuestion(index) {
+      const question = state.questions[state.index];
+      const elapsed = ((performance.now() - state.questionStartedAt) / 1000).toFixed(2);
+      const correct = index === question.correctIndex;
+      if (correct) {
+        state.correct += 1;
+        state.streak += 1;
+        state.feedback = "Correct! The enemy is defeated.";
+        state.feedbackType = "result-ok";
+        if (state.streak > 0 && state.streak % 3 === 0) state.freePasses += 1;
+        if (state.streak > 0 && state.streak % 3 === 0) state.feedback += " Hot streak! You earned a Free Pass.";
+      } else {
+        state.hp = Math.max(0, state.hp - state.damage);
+        state.streak = 0;
+        state.feedback = `Not quite. Correct answer: ${question.options[question.correctIndex]}. ${hpWarningText()}`;
+        state.feedbackType = "result-miss";
+      }
+      state.events.push(eventRow("answer_submitted", `correct=${correct}; chosen=${index + 1}; correct_option=${question.correctIndex + 1}`, question, elapsed));
+      advanceQuestion();
+    }
+
+    function advanceQuestion() {
+      state.index += 1;
+      state.hiddenIndices = [];
+      state.usedHint = false;
+      state.usedFifty = false;
+      state.usedFriend = false;
+      if (state.index >= state.questions.length || state.hp <= 0) {
+        state.events.push(eventRow("task_completed", `score=${state.correct}/${state.questions.length}`));
+        show("survey");
+        return;
+      }
+      renderQuestion();
+    }
+
+    function showHint() {
+      const question = state.questions[state.index];
+      const elapsed = ((performance.now() - state.questionStartedAt) / 1000).toFixed(2);
+      if (state.hintsLeft <= 0 || state.usedHint) return;
+      state.hintsLeft -= 1;
+      state.usedHint = true;
+      byId("hintBox").textContent = `Hint: ${hints[question.id] || "Look for the clue that matches the core concept."}`;
+      byId("hintBox").classList.remove("hidden");
+      state.events.push(eventRow("hint_used", `question_index=${state.index + 1}; remaining_hints=${state.hintsLeft}`, question, elapsed));
+      renderQuestion();
+      byId("hintBox").textContent = `Hint: ${hints[question.id] || "Look for the clue that matches the core concept."}`;
+      byId("hintBox").classList.remove("hidden");
+    }
+
+    function useFiftyFifty() {
+      const question = state.questions[state.index];
+      if (state.fiftyLeft <= 0 || state.usedFifty) return;
+      const wrong = question.options.map((_, index) => index).filter(index => index !== question.correctIndex && !state.hiddenIndices.includes(index));
+      state.hiddenIndices = [...state.hiddenIndices, ...shuffle(wrong).slice(0, 2)];
+      state.fiftyLeft -= 1;
+      state.usedFifty = true;
+      state.events.push(eventRow("fifty_fifty_used", `hidden=${state.hiddenIndices.join("|")}`, question, ((performance.now() - state.questionStartedAt) / 1000).toFixed(2)));
+      renderQuestion();
+    }
+
+    function callFriend() {
+      const question = state.questions[state.index];
+      if (state.callsLeft <= 0 || state.usedFriend) return;
+      const wrong = question.options.map((_, index) => index).filter(index => index !== question.correctIndex);
+      const suggestion = Math.random() < 0.75 ? question.correctIndex : shuffle(wrong)[0];
+      state.callsLeft -= 1;
+      state.usedFriend = true;
+      byId("feedback").textContent = `Study ally suggests option ${suggestion + 1}: ${question.options[suggestion]}`;
+      byId("feedback").className = "result-ok";
+      state.events.push(eventRow("friend_call_used", `suggestion=${suggestion + 1}`, question, ((performance.now() - state.questionStartedAt) / 1000).toFixed(2)));
+      renderQuestion();
+      byId("feedback").textContent = `Study ally suggests option ${suggestion + 1}: ${question.options[suggestion]}`;
+      byId("feedback").className = "result-ok";
+    }
+
+    function useFreePass() {
+      const question = state.questions[state.index];
+      if (state.freePasses <= 0) return;
+      state.freePasses -= 1;
+      state.correct += 1;
+      state.feedback = "Free Pass used. No damage taken; moving to the next encounter.";
+      state.feedbackType = "result-ok";
+      state.events.push(eventRow("free_pass_used", `remaining_free_passes=${state.freePasses}`, question, ((performance.now() - state.questionStartedAt) / 1000).toFixed(2)));
+      advanceQuestion();
+    }
+
+    async function submitSurvey() {
+      state.demographics = {
+        age_range: byId("ageRange").value,
+        learning_background: byId("learningBackground").value,
+        cs_experience: byId("csExperience").value,
+        primary_device: byId("device").value,
+        accessibility_needs: byId("accessibility").value || "none",
+        open_feedback: byId("openFeedback").value || "none",
+        frustration_notes: byId("frustrationNotes").value || "none",
+        positive_notes: byId("positiveNotes").value || "none"
+      };
+      state.survey = surveyPrompts.map(([key, prompt]) => ({
+        participant_code: state.participantCode,
+        question_key: key,
+        prompt,
+        rating: byId(key).value,
+        created_at: nowIso()
+      }));
+      state.events.push(eventRow("study_completed", "browser_submission=true"));
+      saveCompletedHeroProfile();
+      byId("scoreLine").textContent = `Score: ${state.correct}/${state.questions.length}`;
+      byId("storyGift").innerHTML = `<div class="story-scroll"><h2>Quest Story Gift</h2><p>${buildStoryGift()}</p></div>`;
+      byId("summary").textContent = [
+        `Participant: ${state.participantCode}`,
+        `Hero name: ${state.heroName}`,
+        `Hero class: ${state.heroClass}`,
+        `Profile: ${state.profileStatus}`,
+        `Quest: ${state.questTitle}`,
+        `Subject: ${state.subjectTitle}`,
+        `Score: ${state.correct}/${state.questions.length}`,
+        `Age range: ${state.demographics.age_range}`,
+        `Learning background: ${state.demographics.learning_background}`,
+        `CS experience: ${state.demographics.cs_experience}`,
+        `Device: ${state.demographics.primary_device}`,
+        `Comments: ${state.demographics.open_feedback}`,
+        `Frustration notes: ${state.demographics.frustration_notes}`,
+        `Positive notes: ${state.demographics.positive_notes}`
+      ].join("\n");
+      show("complete");
+      byId("submitStatus").textContent = "Submitting study data...";
+      try {
+        const result = await submitStudyData();
+        byId("submitStatus").textContent = `Study data saved. Submission ID: ${result.id}`;
+      } catch (error) {
+        byId("submitStatus").textContent = "Online save was not available. Please use Download My Study CSV as backup.";
+      }
+    }
+
+    function buildStudyPayload() {
+      return {
+        appName: "TutorSpark Learning",
+        appVersion: "week3-hci-vercel",
+        participantCode: state.participantCode,
+        heroName: state.heroName,
+        heroClass: state.heroClass,
+        profileStatus: state.profileStatus,
+        questTitle: state.questTitle,
+        subjectKey: state.subjectKey,
+        subjectTitle: state.subjectTitle,
+        startedAt: state.startedAt,
+        completedAt: nowIso(),
+        score: {
+          correct: state.correct,
+          total: state.questions.length,
+          percent: state.questions.length ? Math.round((state.correct / state.questions.length) * 100) : 0
+        },
+        demographics: state.demographics,
+        survey: state.survey,
+        events: state.events,
+        questionIds: state.questions.map(question => question.id)
+      };
+    }
+
+    async function submitStudyData() {
+      const response = await fetch("/api/submit-study", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildStudyPayload())
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "Study submission failed");
+      }
+      return result;
+    }
+
+    function buildCsv() {
+      const rows = [];
+      rows.push(["record_type", "participant_code", "field", "value", "event_type", "detail", "question_id", "question_topic", "elapsed_seconds", "created_at"]);
+      rows.push(["quest", state.participantCode, "hero_name", state.heroName, "", "", "", "", "", state.startedAt]);
+      rows.push(["quest", state.participantCode, "profile_status", state.profileStatus, "", "", "", "", "", state.startedAt]);
+      rows.push(["quest", state.participantCode, "hero_class", state.heroClass, "", "", "", "", "", state.startedAt]);
+      rows.push(["quest", state.participantCode, "quest_title", state.questTitle, "", "", "", "", "", state.startedAt]);
+      for (const [field, value] of Object.entries(state.demographics)) {
+        rows.push(["demographic", state.participantCode, field, value, "", "", "", "", "", state.startedAt]);
+      }
+      for (const event of state.events) {
+        rows.push(["event", event.participant_code, "", "", event.event_type, event.detail, event.question_id, event.question_topic, event.elapsed_seconds, event.created_at]);
+      }
+      for (const response of state.survey) {
+        rows.push(["survey", response.participant_code, response.question_key, response.rating, "", response.prompt, "", "", "", response.created_at]);
+      }
+      return rows.map(row => row.map(csvEscape).join(",")).join("\n");
+    }
+
+    function buildStoryGift() {
+      const motif = heroMotifs[state.heroClass];
+      const heroName = escapeHtml(state.heroName);
+      const stakes = subjectStakes[state.subjectKey] || "The quest path asked for attention, patience, and a brave try from beginning to end.";
+      let outcome = "The final score became a useful map, showing exactly where practice can make the next run stronger.";
+      if (state.correct === state.questions.length) {
+        outcome = "The final score was perfect, and every trial crystal lit up from start to finish.";
+      } else if (state.correct >= Math.max(1, Math.floor(state.questions.length * 0.7))) {
+        outcome = "The final score showed strong progress, and most of the trial crystals stayed bright.";
+      }
+      return [
+        `${heroName}, a ${motif.role}, ${motif.opening} for ${state.questTitle}. ${stakes} The ${state.subjectTitle} trials did not ask for perfection; they asked for attention, patience, and the courage to try the next prompt.`,
+        `Through the adventure, ${heroName} ${motif.method}. ${motif.ally} By the final prompt, the quest record showed ${state.correct}/${state.questions.length}. ${outcome}`,
+        `As thanks for completing the survey, TutorSpark awards ${heroName} ${motif.gift}. It is proof that this learning path was tested by a real user, and that the next traveler will have a clearer, friendlier adventure because of it.`
+      ].join("<br><br>");
+    }
+
+    function saveCompletedHeroProfile() {
+      const profiles = loadHeroProfiles();
+      const key = heroKey(state.heroName);
+      const previous = profiles[key] || {};
+      const scoreText = `${state.correct}/${state.questions.length}`;
+      profiles[key] = {
+        name: state.heroName,
+        participantCode: state.participantCode,
+        heroClass: state.heroClass,
+        questCount: (previous.questCount || 0) + 1,
+        lastQuest: state.questTitle,
+        lastSubject: state.subjectTitle,
+        lastScore: scoreText,
+        bestScore: bestScore(previous.bestScore, scoreText),
+        updatedAt: nowIso()
+      };
+      saveHeroProfiles(profiles);
+      renderHomeLists();
+    }
+
+    function bestScore(previousScore, currentScore) {
+      if (!previousScore) return currentScore;
+      const [prevCorrect, prevTotal] = previousScore.split("/").map(Number);
+      const [currCorrect, currTotal] = currentScore.split("/").map(Number);
+      if (!prevTotal || !currTotal) return currentScore;
+      return currCorrect / currTotal >= prevCorrect / prevTotal ? currentScore : previousScore;
+    }
+
+    function downloadCsv() {
+      const blob = new Blob([buildCsv()], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `tutorspark-week3-${state.participantCode}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    setupSubjects();
+    setupSurvey();
+    renderHomeLists();
+    byId("heroName").addEventListener("input", refreshHeroProfileStatus);
+    byId("heroName").addEventListener("blur", refreshHeroProfileStatus);
+    document.querySelectorAll("input[name='heroClass']").forEach(radio => {
+      radio.addEventListener("change", refreshHeroProfileStatus);
+    });
+    refreshHeroProfileStatus();
+    byId("dojoBtn").addEventListener("click", openDojoPractice);
+    byId("dojoBeginBtn").addEventListener("click", beginStudy);
+    byId("dojoBackBtn").addEventListener("click", () => show("start"));
+    byId("beginBtn").addEventListener("click", beginStudy);
+    byId("hintBtn").addEventListener("click", showHint);
+    byId("fiftyBtn").addEventListener("click", useFiftyFifty);
+    byId("callBtn").addEventListener("click", callFriend);
+    byId("passBtn").addEventListener("click", useFreePass);
+    byId("submitSurveyBtn").addEventListener("click", submitSurvey);
+    byId("downloadBtn").addEventListener("click", downloadCsv);
+    byId("restartBtn").addEventListener("click", () => {
+      state = null;
+      refreshHeroProfileStatus();
+      show("start");
+    });
+  </script>
+</body>
+</html>

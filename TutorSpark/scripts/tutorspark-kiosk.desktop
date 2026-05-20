@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=TutorSpark Kiosk
+Comment=Start TutorSpark touchscreen study mode
+Exec=bash -lc "cd ~/TutorSpark && bash scripts/raspi_kiosk.sh"
+Terminal=false
+Categories=Education;

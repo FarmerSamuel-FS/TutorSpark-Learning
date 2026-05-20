@@ -1,6 +1,6 @@
-# TutorSpark CLI – Advanced Software Engineering Project (COS550)
+# TutorSpark CLI - Advanced Software Engineering Project (COS550)
 
-TutorSpark CLI is a terminal-based, **RPG-flavored learning assistant** for Computer Science students.
+TutorSpark CLI is a terminal-based, **RPG-flavored learning assistant** for Computer Science students and general learners.
 
 You create a hero persona (Warrior, Mage, Healer, or NEO PRO) and battle through short CS quizzes as turn-based encounters. Under the hood, TutorSpark uses classic **software design patterns** and a simple **adaptive engine** to select questions and record progress to a local SQLite database.
 
@@ -59,11 +59,18 @@ Each class has:
   - HP bar, battle counter, basic text “path”/progress indicator.
   - Correct answers defeat “enemies” (Big-O Ogre, Syntax Sprite, Queue Goblin, etc.).
   - Incorrect answers cost HP.
-- Questions cover:
-  - Algorithms & Big-O
-  - Data structures
-  - Python basics
-  - Software engineering / CI concepts
+- Week 3 category-first quiz navigation:
+  - Math
+  - Science
+  - History
+  - Tech
+  - Computer Knowledge
+- Existing CS quizzes now live under Computer Knowledge:
+  - CS Fundamentals
+  - Algorithms & Complexity
+  - Data Structures
+  - Python Programming
+  - Software Engineering
 
 ### Basic Analytics
 
@@ -75,7 +82,34 @@ Each completed session is stored as a `QuizSession` row:
 - `correct_answers`
 - `created_at`
 
-This gives a foundation for later milestones (progress tracking, adaptive difficulty, etc.).
+This gives a foundation for later milestones (progress tracking, adaptive difficulty, HCI testing, etc.).
+
+### Week 3 HCI Study Mode
+
+Week 3 adds formal user-testing support for a group of 3-5 participants:
+
+- Hero-specific quest framing, so each subject becomes a different named quest
+  depending on whether the learner chooses Warrior, Mage, Healer, or NEO PRO.
+- A post-survey "Quest Story Gift" that gives participants a short custom recap
+  of their hero's adventure as a thank-you for completing the survey.
+- Anonymous participant codes such as `P001`
+- Demographic/background capture:
+  - age range
+  - learning background
+  - computer/CS experience
+  - device used
+  - accessibility notes
+- Post-task survey ratings for:
+  - interface clarity
+  - support/helpfulness
+  - cognitive load
+  - trust
+  - touchscreen readiness
+  - topic/category fit
+- CSV export bundle for paper analysis:
+  - `usability_events.csv`
+  - `survey_responses.csv`
+  - `participant_demographics.csv`
 
 ---
 
@@ -154,9 +188,79 @@ Option 1 - Run from source (dev)
    python -m pip install -r requirements.txt
    python main.py
 
-This launches the CLI, lets you create/load your hero profile, and run the CS Questline session.
+This launches the CLI, lets you create/load your hero profile, choose a learning category, run a quiz, complete study mode, and export Week 3 HCI data.
 
-Option 2 - Standalone macOS binary (PyInstaller)
+Option 2 - Browser study mode for online testers and touchscreen use
+
+1. From the repo root:
+
+   cd TutorSpark
+   python web_app.py
+
+2. Open:
+
+   http://127.0.0.1:8080
+
+The browser version uses large buttons and a single-column responsive layout so it works on phones, tablets, laptops, and a Raspberry Pi 4B with the official 7-inch touchscreen.
+
+Option 3 - GitHub Pages online test deployment
+
+TutorSpark includes a static browser version in `docs/index.html`. This is the easiest free public deployment for remote Week 3 testers because GitHub Pages can publish static HTML, CSS, and JavaScript directly from the repo.
+
+To publish it:
+
+1. Push this repository to GitHub.
+2. In the repository, open Settings > Pages.
+3. Set Source to "Deploy from a branch".
+4. Set Branch to `master` and folder to `/docs`.
+5. Save and wait for GitHub to publish the site.
+
+Your project URL will usually look like:
+
+   https://<github-username>.github.io/<repository-name>/
+
+Important data note: GitHub Pages is static hosting, so it cannot write to TutorSpark's SQLite database. The Pages version lets each online participant download a CSV at the end of the study. Use one of these collection methods:
+
+- Ask each tester to send back the downloaded CSV.
+- Pair the GitHub Pages app with a Google Form/Microsoft Form upload question.
+- Use the Raspberry Pi/local Python web version when you need automatic SQLite logging.
+
+Option 4 - Render online test deployment
+
+TutorSpark includes `render.yaml` for a simple Render web-service deployment. Push this repository to GitHub, create a new Render web service from that repo, and use the free instance type. Render provides an `onrender.com` URL that can be shared with Week 3 testers.
+
+Suggested study workflow:
+
+1. Recruit 3-5 participants with different backgrounds.
+2. Send them the TutorSpark web link.
+3. Ask each participant to complete one quiz and the post-quiz survey.
+4. Export the CSV bundle from the CLI after testing.
+5. Summarize patterns in demographics, score, answer time, hint use, and survey ratings.
+
+Option 5 - Raspberry Pi 4B touchscreen
+
+1. Install Python 3 on Raspberry Pi OS.
+2. Copy or clone the `TutorSpark` folder onto the Pi. If you use the included desktop launcher unchanged, place it at `~/TutorSpark`.
+3. Run:
+
+   cd TutorSpark
+   bash scripts/raspi_start.sh
+
+4. Open Chromium on the Pi to:
+
+   http://127.0.0.1:8080
+
+5. For kiosk-style testing, run:
+
+   bash scripts/raspi_kiosk.sh
+
+6. Optional desktop launcher:
+
+   cp scripts/tutorspark-kiosk.desktop ~/.local/share/applications/
+
+The Raspberry Pi version uses `web_app.py`, stores local SQLite data, and is the best version for your homemade tablet setup.
+
+Option 6 - Standalone macOS binary (PyInstaller)
 
 Standalone Binary Provided, built with PyInstaller's --onefile mode:
 

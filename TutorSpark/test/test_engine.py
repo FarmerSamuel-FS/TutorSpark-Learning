@@ -51,3 +51,11 @@ def test_is_game_over_when_hp_zero_or_no_questions():
     assert engine.is_game_over(current_hp=0, remaining_questions=5) is True
     assert engine.is_game_over(current_hp=1, remaining_questions=0) is True
     assert engine.is_game_over(current_hp=3, remaining_questions=5) is False
+
+
+def test_enemy_name_for_topic_covers_week3_categories():
+    assert engine.enemy_name_for_topic("Arithmetic") == "Number Wraith"
+    assert engine.enemy_name_for_topic("Life Science") == "Lab Slime"
+    assert engine.enemy_name_for_topic("Civics") == "Timeline Phantom"
+    assert engine.enemy_name_for_topic("Internet Safety") == "Glitch Imp"
+    assert engine.enemy_name_for_topic("Algorithms") == "Sorting Slime"
