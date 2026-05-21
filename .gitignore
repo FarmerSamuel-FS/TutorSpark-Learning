@@ -20,3 +20,4 @@ dist/
 
 # SQLite DB created at runtime
 TutorSpark/tutorspark.db
+.vercel

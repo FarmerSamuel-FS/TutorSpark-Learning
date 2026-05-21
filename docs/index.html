@@ -497,8 +497,7 @@
           <div class="menu-card"><strong>View / Select User Profile</strong><span>Return to the welcome screen to load a different exact hero name or create a new hero.</span></div>
           <div class="menu-card"><strong>Progress Report</strong><span id="heroProgressSummary"></span></div>
           <div class="menu-card"><strong>Leaderboard</strong><span>Compare completed quest scores from saved heroes below.</span></div>
-          <div class="menu-card"><strong>Export Study CSV</strong><span>Use the final CSV download after a completed online test.</span></div>
-          <div class="menu-card"><strong>Week 3 Analysis Bundle</strong><span>Use the CLI/Pi option after collecting downloaded CSV files for the 3.7 write-up.</span></div>
+          <div class="menu-card"><strong>Week 3 Study Data</strong><span>Completed quest surveys save automatically for the research analysis.</span></div>
         </div>
         <div id="heroStats"></div>
         <h2>Leaderboard</h2>
@@ -597,8 +596,6 @@
       <p id="scoreLine"></p>
       <p id="submitStatus" class="muted"></p>
       <div id="storyGift"></div>
-      <p class="muted">Download the CSV and send it to the researcher/instructor using the collection method chosen for class.</p>
-      <button id="downloadBtn" type="button">Download My Study CSV</button>
       <button id="restartBtn" class="secondary" type="button">Start Another Participant</button>
       <h2>Summary</h2>
       <pre id="summary" class="summary"></pre>
@@ -960,11 +957,6 @@
 
     function nowIso() {
       return new Date().toISOString();
-    }
-
-    function csvEscape(value) {
-      const text = String(value ?? "");
-      return `"${text.replaceAll('"', '""')}"`;
     }
 
     function escapeHtml(value) {
@@ -1414,9 +1406,9 @@
       byId("submitStatus").textContent = "Submitting study data...";
       try {
         const result = await submitStudyData();
-        byId("submitStatus").textContent = `Study data saved. Submission ID: ${result.id}`;
+        byId("submitStatus").textContent = `Study data saved for the TutorSpark Week 3 HCI analysis. Submission ID: ${result.id}`;
       } catch (error) {
-        byId("submitStatus").textContent = "Online save was not available. Please use Download My Study CSV as backup.";
+        byId("submitStatus").textContent = "Online save was not available. Please notify the researcher before closing this screen.";
       }
     }
 
@@ -1456,25 +1448,6 @@
         throw new Error(result.error || "Study submission failed");
       }
       return result;
-    }
-
-    function buildCsv() {
-      const rows = [];
-      rows.push(["record_type", "participant_code", "field", "value", "event_type", "detail", "question_id", "question_topic", "elapsed_seconds", "created_at"]);
-      rows.push(["quest", state.participantCode, "hero_name", state.heroName, "", "", "", "", "", state.startedAt]);
-      rows.push(["quest", state.participantCode, "profile_status", state.profileStatus, "", "", "", "", "", state.startedAt]);
-      rows.push(["quest", state.participantCode, "hero_class", state.heroClass, "", "", "", "", "", state.startedAt]);
-      rows.push(["quest", state.participantCode, "quest_title", state.questTitle, "", "", "", "", "", state.startedAt]);
-      for (const [field, value] of Object.entries(state.demographics)) {
-        rows.push(["demographic", state.participantCode, field, value, "", "", "", "", "", state.startedAt]);
-      }
-      for (const event of state.events) {
-        rows.push(["event", event.participant_code, "", "", event.event_type, event.detail, event.question_id, event.question_topic, event.elapsed_seconds, event.created_at]);
-      }
-      for (const response of state.survey) {
-        rows.push(["survey", response.participant_code, response.question_key, response.rating, "", response.prompt, "", "", "", response.created_at]);
-      }
-      return rows.map(row => row.map(csvEscape).join(",")).join("\n");
     }
 
     function buildStoryGift() {
@@ -1522,18 +1495,6 @@
       return currCorrect / currTotal >= prevCorrect / prevTotal ? currentScore : previousScore;
     }
 
-    function downloadCsv() {
-      const blob = new Blob([buildCsv()], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `tutorspark-week3-${state.participantCode}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    }
-
     setupSubjects();
     setupSurvey();
     renderHomeLists();
@@ -1552,7 +1513,6 @@
     byId("callBtn").addEventListener("click", callFriend);
     byId("passBtn").addEventListener("click", useFreePass);
     byId("submitSurveyBtn").addEventListener("click", submitSurvey);
-    byId("downloadBtn").addEventListener("click", downloadCsv);
     byId("restartBtn").addEventListener("click", () => {
       state = null;
       refreshHeroProfileStatus();
