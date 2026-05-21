@@ -341,7 +341,7 @@ def _run_subject_quiz_study(engine: AdaptiveEngine, profile) -> None:
     tutoring_condition = "constrained"
     subject_title = SUBJECT_QUIZZES[subject_key]["title"]
     quest_title = get_hero_subject_quest_title(profile, subject_key)
-    task_name = f"{quest_title} Week 3 HCI quest"
+    task_name = f"{quest_title} TutorSpark quest"
     study = StudySession(
         id=None,
         profile_id=profile.id,
@@ -355,7 +355,7 @@ def _run_subject_quiz_study(engine: AdaptiveEngine, profile) -> None:
     print(f"Anonymous participant code: {participant_code}")
     print(f"Hero quest: {quest_title}")
     print(f"Task: complete one {subject_title} quest, then finish the short survey.")
-    print("Your actions, timing, support use, and survey answers will be logged locally for Week 3 HCI analysis.")
+    print("Your actions, timing, support use, and survey answers will be logged locally for TutorSpark learning analysis.")
 
     condition_metadata = f"study_mode=true; tutoring_condition={tutoring_condition}"
     _record_study_event(
@@ -414,15 +414,15 @@ def _export_usability_csv(profile) -> None:
     output_dir = (
         Path.home()
         / "Desktop"
-        / f"TutorSpark_Week3_HCI_Data_{safe_name}"
+        / f"TutorSpark_Learning_Data_{safe_name}"
     )
     paths = db.export_study_bundle_csv(profile.id, output_dir)
-    print("\nWeek 3 HCI study CSV bundle exported:")
+    print("\nTutorSpark learning CSV bundle exported:")
     for label, path in paths.items():
         print(f"- {label.title()}: {path}")
 
 
-def _export_week3_analysis_bundle() -> None:
+def _export_learning_analysis_bundle() -> None:
     script_path = Path(__file__).resolve().parent / "scripts" / "week3_collect_analyze.py"
     subprocess.run([sys.executable, str(script_path)], check=True)
 
@@ -440,14 +440,14 @@ def main() -> None:
 
     # Simple menu
     while True:
-        print(color("=== TutorSpark CLI - Week 3 HCI Build ===", YELLOW, BOLD))
+        print(color("=== TutorSpark CLI - Learning Build ===", YELLOW, BOLD))
         print("1. Start subject quiz")
         print("2. Dojo Practice Run")
         print("3. View/select user profile")
         print("4. View progress report")
         print("5. View leaderboard")
         print("6. Export usability study CSV")
-        print("7. Export Week 3 analysis bundle")
+        print("7. Export learning analysis bundle")
         print("8. Exit")
 
         choice = read_menu_choice("Choose an option: ")
@@ -465,7 +465,7 @@ def main() -> None:
         elif choice == "6":
             _export_usability_csv(profile)
         elif choice == "7":
-            _export_week3_analysis_bundle()
+            _export_learning_analysis_bundle()
         elif choice == "8":
             print("Goodbye, and good luck with your studies!")
             break

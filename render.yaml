@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: tutorspark-week3-study
+    name: tutorspark-learning
     runtime: python
     plan: free
     buildCommand: cd TutorSpark && pip install -r requirements.txt

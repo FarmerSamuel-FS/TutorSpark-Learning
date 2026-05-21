@@ -683,7 +683,7 @@ class TutorSparkWebHandler(BaseHTTPRequestHandler):
                     id=None,
                     name=hero_name,
                     level="Participant",
-                    focus_area="Week 3 HCI Study",
+                    focus_area="TutorSpark Learning",
                     hero_class=selected_hero_class,
                 )
             )
@@ -729,7 +729,7 @@ class TutorSparkWebHandler(BaseHTTPRequestHandler):
     <div class="menu-card"><strong>Progress Report</strong><span>{summary['session_count']} sessions | {summary['correct_answers']}/{summary['total_questions']} correct | Avg {summary['average_score']:.0f}% | Best {summary['best_score']:.0f}%</span></div>
     <div class="menu-card"><strong>Leaderboard</strong><span>Compare completed quest scores from saved heroes below.</span></div>
     <div class="menu-card"><strong>Export Study CSV</strong><span>On Pi/CLI, option 6 exports the full study bundle after completed quests.</span></div>
-    <div class="menu-card"><strong>Week 3 Analysis Bundle</strong><span>On Pi/CLI, option 7 creates the Sunday analysis report for the 3.7 write-up.</span></div>
+    <div class="menu-card"><strong>Learning Analysis Bundle</strong><span>On Pi/CLI, option 7 creates the analysis report from completed quests.</span></div>
   </div>
   <div class="stat-line"><span>Average answer time</span><strong>{summary['average_answer_seconds']:.1f}s</strong></div>
   <div class="stat-line"><span>Slowest answer time</span><strong>{summary['slowest_answer_seconds']:.1f}s</strong></div>
@@ -1265,7 +1265,7 @@ class TutorSparkWebHandler(BaseHTTPRequestHandler):
 <section class="panel">
   <h2>Thank You</h2>
   {score}
-  <p>Your anonymous study data and survey feedback were recorded for the TutorSpark Week 3 HCI analysis.</p>
+  <p>Your anonymous learning data and survey feedback were recorded for TutorSpark Learning.</p>
   {story}
   <a class="button" href="/">Start Another Session</a>
 </section>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TutorSpark Week 3 HCI Study</title>
+  <title>TutorSpark Learning</title>
   <style>
     :root {
       color-scheme: light;
@@ -497,7 +497,7 @@
           <div class="menu-card"><strong>View / Select User Profile</strong><span>Return to the welcome screen to load a different exact hero name or create a new hero.</span></div>
           <div class="menu-card"><strong>Progress Report</strong><span id="heroProgressSummary"></span></div>
           <div class="menu-card"><strong>Leaderboard</strong><span>Compare completed quest scores from saved heroes below.</span></div>
-          <div class="menu-card"><strong>Week 3 Study Data</strong><span>Completed quest surveys save automatically for the research analysis.</span></div>
+          <div class="menu-card"><strong>TutorSpark Data</strong><span>Completed quest surveys save automatically for the learning analysis.</span></div>
         </div>
         <div id="heroStats"></div>
         <h2>Leaderboard</h2>
@@ -1406,7 +1406,7 @@
       byId("submitStatus").textContent = "Submitting study data...";
       try {
         const result = await submitStudyData();
-        byId("submitStatus").textContent = `Study data saved for the TutorSpark Week 3 HCI analysis. Submission ID: ${result.id}`;
+        byId("submitStatus").textContent = `TutorSpark learning data saved. Submission ID: ${result.id}`;
       } catch (error) {
         byId("submitStatus").textContent = "Online save was not available. Please notify the researcher before closing this screen.";
       }
@@ -1415,7 +1415,7 @@
     function buildStudyPayload() {
       return {
         appName: "TutorSpark Learning",
-        appVersion: "week3-hci-vercel",
+        appVersion: "tutorspark-learning-vercel",
         participantCode: state.participantCode,
         heroName: state.heroName,
         heroClass: state.heroClass,

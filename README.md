@@ -59,7 +59,7 @@ Each class has:
   - HP bar, battle counter, basic text “path”/progress indicator.
   - Correct answers defeat “enemies” (Big-O Ogre, Syntax Sprite, Queue Goblin, etc.).
   - Incorrect answers cost HP.
-- Week 3 category-first quiz navigation:
+- Category-first quiz navigation:
   - Math
   - Science
   - History
@@ -82,11 +82,11 @@ Each completed session is stored as a `QuizSession` row:
 - `correct_answers`
 - `created_at`
 
-This gives a foundation for later milestones (progress tracking, adaptive difficulty, HCI testing, etc.).
+This gives a foundation for later milestones such as progress tracking and adaptive difficulty.
 
-### Week 3 HCI Study Mode
+### TutorSpark Learning Data
 
-Week 3 adds formal user-testing support for a group of 3-5 participants:
+TutorSpark includes user-testing support for learning sessions:
 
 - Hero-specific quest framing, so each subject becomes a different named quest
   depending on whether the learner chooses Warrior, Mage, Healer, or NEO PRO.
@@ -188,9 +188,9 @@ Option 1 - Run from source (dev)
    python -m pip install -r requirements.txt
    python main.py
 
-This launches the CLI, lets you create/load your hero profile, choose a learning category, run a quiz, complete study mode, and export Week 3 HCI data.
+This launches the CLI, lets you create/load your hero profile, choose a learning category, run a quiz, complete the survey, and export TutorSpark learning data.
 
-Option 2 - Browser study mode for online testers and touchscreen use
+Option 2 - Browser learning mode for online testers and touchscreen use
 
 1. From the repo root:
 
@@ -205,7 +205,7 @@ The browser version uses large buttons and a single-column responsive layout so 
 
 Option 3 - GitHub Pages online test deployment
 
-TutorSpark includes a static browser version in `docs/index.html`. This is the easiest free public deployment for remote Week 3 testers because GitHub Pages can publish static HTML, CSS, and JavaScript directly from the repo.
+TutorSpark includes a static browser version in `docs/index.html`. This is an easy free public deployment option because GitHub Pages can publish static HTML, CSS, and JavaScript directly from the repo.
 
 To publish it:
 
@@ -219,15 +219,14 @@ Your project URL will usually look like:
 
    https://<github-username>.github.io/<repository-name>/
 
-Important data note: GitHub Pages is static hosting, so it cannot write to TutorSpark's SQLite database. The Pages version lets each online participant download a CSV at the end of the study. Use one of these collection methods:
+Important data note: GitHub Pages is static hosting, so it cannot write to TutorSpark's SQLite database. Use one of these collection methods:
 
-- Ask each tester to send back the downloaded CSV.
 - Pair the GitHub Pages app with a Google Form/Microsoft Form upload question.
 - Use the Raspberry Pi/local Python web version when you need automatic SQLite logging.
 
 Option 4 - Render online test deployment
 
-TutorSpark includes `render.yaml` for a simple Render web-service deployment. Push this repository to GitHub, create a new Render web service from that repo, and use the free instance type. Render provides an `onrender.com` URL that can be shared with Week 3 testers.
+TutorSpark includes `render.yaml` for a simple Render web-service deployment. Push this repository to GitHub, create a new Render web service from that repo, and use the free instance type. Render provides an `onrender.com` URL that can be shared with testers.
 
 Suggested study workflow:
 
