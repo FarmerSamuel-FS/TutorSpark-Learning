@@ -1,0 +1,1045 @@
+{
+  "ok": true,
+  "source": "sanitized-local-study-snapshot",
+  "count": 6,
+  "records": [
+    {
+      "id": "6a137f2bc2bf2de7ab5a54ba",
+      "submittedAt": "2026-05-24T22:43:55.258Z",
+      "participantCode": "P-507898",
+      "heroName": "Sirpuffsalot",
+      "heroClass": "Warrior",
+      "questTitle": "Banner Oath of the First Council",
+      "subjectKey": "history_civics",
+      "subjectTitle": "History & Civics",
+      "score": {
+        "correct": 5,
+        "total": 5,
+        "percent": 100
+      },
+      "demographics": {
+        "age_range": "35-44",
+        "learning_background": "K-12",
+        "cs_experience": "intermediate",
+        "primary_device": "phone",
+        "accessibility_needs": "none",
+        "open_feedback": "Very user friendly, super cool way to learn ",
+        "frustration_notes": "none",
+        "positive_notes": "I like how it turned it in a game the whole process flowed well"
+      },
+      "survey": [
+        {
+          "participant_code": "P-507898",
+          "question_key": "interface_clarity",
+          "prompt": "The interface was easy to understand.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "support_helpfulness",
+          "prompt": "The hints and support tools helped me reason through the answers.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "cognitive_load",
+          "prompt": "The tutoring flow felt manageable and not overwhelming.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "trust",
+          "prompt": "I trusted the tutoring feedback during the session.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "touch_readiness",
+          "prompt": "The controls and prompts would work well on a touchscreen.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "topic_fit",
+          "prompt": "The subject/category choices matched what I expected to study.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "engagement_level",
+          "prompt": "The quest kept me engaged during the session.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "tutoring_effectiveness",
+          "prompt": "The tutoring condition helped me understand the material.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "question_key": "interaction_quality",
+          "prompt": "The interaction quality felt smooth and useful.",
+          "rating": "5",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        }
+      ],
+      "events": [
+        {
+          "participant_code": "P-507898",
+          "event_type": "study_started",
+          "detail": "subject=History & Civics; hero=Warrior; hero_name=Sirpuffsalot; profile=created; quest=Banner Oath of the First Council",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T22:41:47.900Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 41,
+          "question_topic": "Geography",
+          "elapsed_seconds": "8.64",
+          "created_at": "2026-05-24T22:41:56.549Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=1; correct_option=1",
+          "question_id": 63,
+          "question_topic": "Civics",
+          "elapsed_seconds": "9.57",
+          "created_at": "2026-05-24T22:42:06.117Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=1; correct_option=1",
+          "question_id": 65,
+          "question_topic": "U.S. History",
+          "elapsed_seconds": "5.01",
+          "created_at": "2026-05-24T22:42:11.133Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 38,
+          "question_topic": "U.S. History",
+          "elapsed_seconds": "2.90",
+          "created_at": "2026-05-24T22:42:14.033Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 62,
+          "question_topic": "World History",
+          "elapsed_seconds": "3.15",
+          "created_at": "2026-05-24T22:42:17.183Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "task_completed",
+          "detail": "score=5/5",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T22:42:17.183Z"
+        },
+        {
+          "participant_code": "P-507898",
+          "event_type": "study_completed",
+          "detail": "browser_submission=true",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T22:43:54.376Z"
+        }
+      ],
+      "questionIds": [
+        41,
+        63,
+        65,
+        38,
+        62
+      ],
+      "source": "vercel",
+      "appVersion": "tutorspark-learning-vercel"
+    },
+    {
+      "id": "6a13742dad0363ca369f9912",
+      "submittedAt": "2026-05-24T21:57:01.017Z",
+      "participantCode": "P-633267",
+      "heroName": "Jdd",
+      "heroClass": "Warrior",
+      "questTitle": "Shield Count at Numbergate",
+      "subjectKey": "basic_math",
+      "subjectTitle": "Basic Math",
+      "score": {
+        "correct": 4,
+        "total": 5,
+        "percent": 80
+      },
+      "demographics": {
+        "age_range": "under 18",
+        "learning_background": "K-12",
+        "cs_experience": "none",
+        "primary_device": "phone",
+        "accessibility_needs": "none",
+        "open_feedback": "none",
+        "frustration_notes": "none",
+        "positive_notes": "none"
+      },
+      "survey": [
+        {
+          "participant_code": "P-633267",
+          "question_key": "interface_clarity",
+          "prompt": "The interface was easy to understand.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "support_helpfulness",
+          "prompt": "The hints and support tools helped me reason through the answers.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "cognitive_load",
+          "prompt": "The tutoring flow felt manageable and not overwhelming.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "trust",
+          "prompt": "I trusted the tutoring feedback during the session.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "touch_readiness",
+          "prompt": "The controls and prompts would work well on a touchscreen.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "topic_fit",
+          "prompt": "The subject/category choices matched what I expected to study.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "engagement_level",
+          "prompt": "The quest kept me engaged during the session.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "tutoring_effectiveness",
+          "prompt": "The tutoring condition helped me understand the material.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "question_key": "interaction_quality",
+          "prompt": "The interaction quality felt smooth and useful.",
+          "rating": "3",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        }
+      ],
+      "events": [
+        {
+          "participant_code": "P-633267",
+          "event_type": "study_started",
+          "detail": "subject=Basic Math; hero=Warrior; hero_name=Jdd; profile=created; quest=Shield Count at Numbergate",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T21:53:53.272Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 29,
+          "question_topic": "Geometry",
+          "elapsed_seconds": "40.78",
+          "created_at": "2026-05-24T21:54:34.060Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=1; correct_option=1",
+          "question_id": 31,
+          "question_topic": "Data Literacy",
+          "elapsed_seconds": "15.78",
+          "created_at": "2026-05-24T21:54:49.845Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "answer_submitted",
+          "detail": "correct=false; chosen=4; correct_option=2",
+          "question_id": 55,
+          "question_topic": "Data Literacy",
+          "elapsed_seconds": "62.44",
+          "created_at": "2026-05-24T21:55:52.286Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 54,
+          "question_topic": "Algebra",
+          "elapsed_seconds": "14.82",
+          "created_at": "2026-05-24T21:56:07.109Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 52,
+          "question_topic": "Fractions",
+          "elapsed_seconds": "20.05",
+          "created_at": "2026-05-24T21:56:27.163Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "task_completed",
+          "detail": "score=4/5",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T21:56:27.163Z"
+        },
+        {
+          "participant_code": "P-633267",
+          "event_type": "study_completed",
+          "detail": "browser_submission=true",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T21:56:59.993Z"
+        }
+      ],
+      "questionIds": [
+        29,
+        31,
+        55,
+        54,
+        52
+      ],
+      "source": "vercel",
+      "appVersion": "tutorspark-learning-vercel"
+    },
+    {
+      "id": "6a136ed6a6625da613695d2d",
+      "submittedAt": "2026-05-24T21:34:14.903Z",
+      "participantCode": "P-316463",
+      "heroName": "Sunshine",
+      "heroClass": "Mage",
+      "questTitle": "Runes of Balance",
+      "subjectKey": "basic_math",
+      "subjectTitle": "Basic Math",
+      "score": {
+        "correct": 3,
+        "total": 5,
+        "percent": 60
+      },
+      "demographics": {
+        "age_range": "25-34",
+        "learning_background": "K-12",
+        "cs_experience": "none",
+        "primary_device": "tablet",
+        "accessibility_needs": "none",
+        "open_feedback": "none",
+        "frustration_notes": "No",
+        "positive_notes": "Everything worked well."
+      },
+      "survey": [
+        {
+          "participant_code": "P-316463",
+          "question_key": "interface_clarity",
+          "prompt": "The interface was easy to understand.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "support_helpfulness",
+          "prompt": "The hints and support tools helped me reason through the answers.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "cognitive_load",
+          "prompt": "The tutoring flow felt manageable and not overwhelming.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "trust",
+          "prompt": "I trusted the tutoring feedback during the session.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "touch_readiness",
+          "prompt": "The controls and prompts would work well on a touchscreen.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "topic_fit",
+          "prompt": "The subject/category choices matched what I expected to study.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "engagement_level",
+          "prompt": "The quest kept me engaged during the session.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "tutoring_effectiveness",
+          "prompt": "The tutoring condition helped me understand the material.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "question_key": "interaction_quality",
+          "prompt": "The interaction quality felt smooth and useful.",
+          "rating": "5",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        }
+      ],
+      "events": [
+        {
+          "participant_code": "P-316463",
+          "event_type": "study_started",
+          "detail": "subject=Basic Math; hero=Mage; hero_name=Sunshine; profile=created; quest=Runes of Balance",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T21:31:56.469Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 52,
+          "question_topic": "Fractions",
+          "elapsed_seconds": "26.04",
+          "created_at": "2026-05-24T21:32:22.517Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 50,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "14.39",
+          "created_at": "2026-05-24T21:32:36.911Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "answer_submitted",
+          "detail": "correct=false; chosen=4; correct_option=2",
+          "question_id": 55,
+          "question_topic": "Data Literacy",
+          "elapsed_seconds": "5.85",
+          "created_at": "2026-05-24T21:32:42.762Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "answer_submitted",
+          "detail": "correct=false; chosen=1; correct_option=2",
+          "question_id": 26,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "7.18",
+          "created_at": "2026-05-24T21:32:49.942Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 27,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "2.59",
+          "created_at": "2026-05-24T21:32:52.541Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "task_completed",
+          "detail": "score=3/5",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T21:32:52.541Z"
+        },
+        {
+          "participant_code": "P-316463",
+          "event_type": "study_completed",
+          "detail": "browser_submission=true",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-24T21:34:11.043Z"
+        }
+      ],
+      "questionIds": [
+        52,
+        50,
+        55,
+        26,
+        27
+      ],
+      "source": "vercel",
+      "appVersion": "tutorspark-learning-vercel"
+    },
+    {
+      "id": "6a120a33760a90dd47c027f7",
+      "submittedAt": "2026-05-23T20:12:35.213Z",
+      "participantCode": "P-953724",
+      "heroName": "Angry",
+      "heroClass": "Warrior",
+      "questTitle": "Shield Count at Numbergate",
+      "subjectKey": "basic_math",
+      "subjectTitle": "Basic Math",
+      "score": {
+        "correct": 5,
+        "total": 5,
+        "percent": 100
+      },
+      "demographics": {
+        "age_range": "35-44",
+        "learning_background": "college",
+        "cs_experience": "intermediate",
+        "primary_device": "phone",
+        "accessibility_needs": "none",
+        "open_feedback": "none",
+        "frustration_notes": "none",
+        "positive_notes": "none"
+      },
+      "survey": [
+        {
+          "participant_code": "P-953724",
+          "question_key": "interface_clarity",
+          "prompt": "The interface was easy to understand.",
+          "rating": "4",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "support_helpfulness",
+          "prompt": "The hints and support tools helped me reason through the answers.",
+          "rating": "5",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "cognitive_load",
+          "prompt": "The tutoring flow felt manageable and not overwhelming.",
+          "rating": "4",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "trust",
+          "prompt": "I trusted the tutoring feedback during the session.",
+          "rating": "5",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "touch_readiness",
+          "prompt": "The controls and prompts would work well on a touchscreen.",
+          "rating": "4",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "topic_fit",
+          "prompt": "The subject/category choices matched what I expected to study.",
+          "rating": "4",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "engagement_level",
+          "prompt": "The quest kept me engaged during the session.",
+          "rating": "4",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "tutoring_effectiveness",
+          "prompt": "The tutoring condition helped me understand the material.",
+          "rating": "2",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "question_key": "interaction_quality",
+          "prompt": "The interaction quality felt smooth and useful.",
+          "rating": "5",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        }
+      ],
+      "events": [
+        {
+          "participant_code": "P-953724",
+          "event_type": "study_started",
+          "detail": "subject=Basic Math; hero=Warrior; hero_name=Angry; profile=created; quest=Shield Count at Numbergate",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-23T20:09:13.725Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 29,
+          "question_topic": "Geometry",
+          "elapsed_seconds": "44.80",
+          "created_at": "2026-05-23T20:09:58.527Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 54,
+          "question_topic": "Algebra",
+          "elapsed_seconds": "7.93",
+          "created_at": "2026-05-23T20:10:06.457Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 26,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "17.54",
+          "created_at": "2026-05-23T20:10:23.997Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 55,
+          "question_topic": "Data Literacy",
+          "elapsed_seconds": "16.96",
+          "created_at": "2026-05-23T20:10:40.961Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=1; correct_option=1",
+          "question_id": 31,
+          "question_topic": "Data Literacy",
+          "elapsed_seconds": "39.14",
+          "created_at": "2026-05-23T20:11:20.103Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "task_completed",
+          "detail": "score=5/5",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-23T20:11:20.103Z"
+        },
+        {
+          "participant_code": "P-953724",
+          "event_type": "study_completed",
+          "detail": "browser_submission=true",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-23T20:12:32.926Z"
+        }
+      ],
+      "questionIds": [
+        29,
+        54,
+        26,
+        55,
+        31
+      ],
+      "source": "vercel",
+      "appVersion": "tutorspark-learning-vercel"
+    },
+    {
+      "id": "6a0ecda5f4c09163ec5620c5",
+      "submittedAt": "2026-05-21T09:17:25.982Z",
+      "participantCode": "P-819841",
+      "heroName": "kia",
+      "heroClass": "Warrior",
+      "questTitle": "Shield Count at Numbergate",
+      "subjectKey": "basic_math",
+      "subjectTitle": "Basic Math",
+      "score": {
+        "correct": 5,
+        "total": 5,
+        "percent": 100
+      },
+      "demographics": {
+        "age_range": "under 18",
+        "learning_background": "K-12",
+        "cs_experience": "none",
+        "primary_device": "desktop",
+        "accessibility_needs": "none",
+        "open_feedback": "none",
+        "frustration_notes": "none",
+        "positive_notes": "none"
+      },
+      "survey": [
+        {
+          "participant_code": "P-819841",
+          "question_key": "interface_clarity",
+          "prompt": "The interface was easy to understand.",
+          "rating": "5",
+          "created_at": "2026-05-21T09:17:15.385Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "support_helpfulness",
+          "prompt": "The hints and support tools helped me reason through the answers.",
+          "rating": "5",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "cognitive_load",
+          "prompt": "The tutoring flow felt manageable and not overwhelming.",
+          "rating": "5",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "trust",
+          "prompt": "I trusted the tutoring feedback during the session.",
+          "rating": "5",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "touch_readiness",
+          "prompt": "The controls and prompts would work well on a touchscreen.",
+          "rating": "3",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "topic_fit",
+          "prompt": "The subject/category choices matched what I expected to study.",
+          "rating": "3",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "engagement_level",
+          "prompt": "The quest kept me engaged during the session.",
+          "rating": "3",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "tutoring_effectiveness",
+          "prompt": "The tutoring condition helped me understand the material.",
+          "rating": "3",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "question_key": "interaction_quality",
+          "prompt": "The interaction quality felt smooth and useful.",
+          "rating": "3",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        }
+      ],
+      "events": [
+        {
+          "participant_code": "P-819841",
+          "event_type": "study_started",
+          "detail": "subject=Basic Math; hero=Warrior; hero_name=kia; profile=created; quest=Shield Count at Numbergate",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-21T09:13:39.842Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 29,
+          "question_topic": "Geometry",
+          "elapsed_seconds": "28.65",
+          "created_at": "2026-05-21T09:14:08.493Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 28,
+          "question_topic": "Fractions",
+          "elapsed_seconds": "73.83",
+          "created_at": "2026-05-21T09:15:22.322Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 27,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "15.88",
+          "created_at": "2026-05-21T09:15:38.206Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 30,
+          "question_topic": "Algebra",
+          "elapsed_seconds": "9.67",
+          "created_at": "2026-05-21T09:15:47.876Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 50,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "3.80",
+          "created_at": "2026-05-21T09:15:51.674Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "task_completed",
+          "detail": "score=5/5",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-21T09:15:51.674Z"
+        },
+        {
+          "participant_code": "P-819841",
+          "event_type": "study_completed",
+          "detail": "browser_submission=true",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-21T09:17:15.386Z"
+        }
+      ],
+      "questionIds": [
+        29,
+        28,
+        27,
+        30,
+        50
+      ],
+      "source": "vercel",
+      "appVersion": "tutorspark-learning-vercel"
+    },
+    {
+      "id": "6a0e761de78b007c91e6f930",
+      "submittedAt": "2026-05-21T03:03:57.465Z",
+      "participantCode": "P-557711",
+      "heroName": "IcepikDK",
+      "heroClass": "Mage",
+      "questTitle": "Runes of Balance",
+      "subjectKey": "basic_math",
+      "subjectTitle": "Basic Math",
+      "score": {
+        "correct": 4,
+        "total": 5,
+        "percent": 80
+      },
+      "demographics": {
+        "age_range": "35-44",
+        "learning_background": "college",
+        "cs_experience": "advanced",
+        "primary_device": "laptop",
+        "accessibility_needs": "none",
+        "open_feedback": "none",
+        "frustration_notes": "none",
+        "positive_notes": "none"
+      },
+      "survey": [
+        {
+          "participant_code": "P-557711",
+          "question_key": "interface_clarity",
+          "prompt": "The interface was easy to understand.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "support_helpfulness",
+          "prompt": "The hints and support tools helped me reason through the answers.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "cognitive_load",
+          "prompt": "The tutoring flow felt manageable and not overwhelming.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "trust",
+          "prompt": "I trusted the tutoring feedback during the session.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "touch_readiness",
+          "prompt": "The controls and prompts would work well on a touchscreen.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "topic_fit",
+          "prompt": "The subject/category choices matched what I expected to study.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "engagement_level",
+          "prompt": "The quest kept me engaged during the session.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "tutoring_effectiveness",
+          "prompt": "The tutoring condition helped me understand the material.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "question_key": "interaction_quality",
+          "prompt": "The interaction quality felt smooth and useful.",
+          "rating": "3",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        }
+      ],
+      "events": [
+        {
+          "participant_code": "P-557711",
+          "event_type": "study_started",
+          "detail": "subject=Basic Math; hero=Mage; hero_name=IcepikDK; profile=created; quest=Runes of Balance",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-21T03:02:37.711Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 55,
+          "question_topic": "Data Literacy",
+          "elapsed_seconds": "11.98",
+          "created_at": "2026-05-21T03:02:49.697Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 28,
+          "question_topic": "Fractions",
+          "elapsed_seconds": "5.56",
+          "created_at": "2026-05-21T03:02:55.262Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "answer_submitted",
+          "detail": "correct=false; chosen=1; correct_option=2",
+          "question_id": 52,
+          "question_topic": "Fractions",
+          "elapsed_seconds": "9.56",
+          "created_at": "2026-05-21T03:03:04.822Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=3; correct_option=3",
+          "question_id": 50,
+          "question_topic": "Arithmetic",
+          "elapsed_seconds": "14.53",
+          "created_at": "2026-05-21T03:03:19.345Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "answer_submitted",
+          "detail": "correct=true; chosen=2; correct_option=2",
+          "question_id": 54,
+          "question_topic": "Algebra",
+          "elapsed_seconds": "6.06",
+          "created_at": "2026-05-21T03:03:25.405Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "task_completed",
+          "detail": "score=4/5",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-21T03:03:25.405Z"
+        },
+        {
+          "participant_code": "P-557711",
+          "event_type": "study_completed",
+          "detail": "browser_submission=true",
+          "question_id": "",
+          "question_topic": "",
+          "elapsed_seconds": "",
+          "created_at": "2026-05-21T03:03:56.548Z"
+        }
+      ],
+      "questionIds": [
+        55,
+        28,
+        52,
+        50,
+        54
+      ],
+      "source": "vercel",
+      "appVersion": "tutorspark-learning-web"
+    }
+  ]
+}

@@ -106,6 +106,18 @@ TutorSpark includes user-testing support for learning sessions:
   - trust
   - touchscreen readiness
   - topic/category fit
+- Final learning-support instrumentation:
+  - Learners choose Guided, Standard, or Challenge difficulty before a quest.
+  - Each subject has Easy, Medium, and Hard question pools mapped to elementary,
+    high-school, and college/higher moderate knowledge levels.
+  - Quest questions are shuffled from the selected subject and difficulty pool on
+    each run to reduce memorization effects during repeated testing.
+  - The quest screen explains Hint, 50/50, Call, and Free Pass before users answer.
+  - Dojo Practice Run openings are logged before the battle begins.
+  - Coach nudges appear when a learner has not used support tools.
+  - Hint, 50/50, Call, and Free Pass actions are counted in the final payload.
+  - Missed topics are summarized into a personalized mastery report.
+  - The export API includes support counts, coaching nudges, missed topics, and the next-step recommendation.
 - CSV export bundle for paper analysis:
   - `usability_events.csv`
   - `survey_responses.csv`

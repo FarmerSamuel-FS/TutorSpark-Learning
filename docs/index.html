@@ -394,6 +394,96 @@
       padding: 12px;
       overflow-x: auto;
     }
+    .coach-box {
+      border: 1px solid #bae6fd;
+      border-left: 6px solid #0284c7;
+      border-radius: 8px;
+      background: #f0f9ff;
+      padding: 12px 14px;
+      margin: 12px 0;
+      color: #0c4a6e;
+      font-weight: 700;
+    }
+    .support-guide {
+      border: 1px solid #fde68a;
+      border-left: 6px solid var(--gold);
+      border-radius: 8px;
+      background: #fffbeb;
+      padding: 14px;
+      margin: 12px 0;
+    }
+    .support-guide strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #92400e;
+    }
+    .support-guide ul {
+      margin: 8px 0 0;
+      padding-left: 22px;
+    }
+    .support-guide li {
+      margin: 4px 0;
+    }
+    .difficulty-note {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .baseline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .baseline-stat {
+      border: 1px solid #d8e1e8;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 12px;
+    }
+    .baseline-stat strong {
+      display: block;
+      font-size: 22px;
+      color: var(--accent-dark);
+    }
+    .baseline-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 15px;
+    }
+    .baseline-table th,
+    .baseline-table td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .baseline-table th {
+      color: #334155;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+    .mastery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .mastery-card {
+      border: 1px solid #d8e1e8;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 14px;
+    }
+    .mastery-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
     @media (max-width: 720px) {
       body { font-size: 20px; }
       h1 { font-size: 28px; }
@@ -488,6 +578,16 @@
         <ol id="homeLeaderboardList"></ol>
       </div>
 
+      <div class="panel">
+        <h2>TutorSpark Study Snapshot</h2>
+        <p class="muted">
+          A summary of early TutorSpark learning sessions. These results help show how learners
+          completed quests across devices and where the tutoring experience is being improved.
+        </p>
+        <div id="baselineSummary" class="baseline-grid"></div>
+        <div id="baselineDetails"></div>
+      </div>
+
       <div id="heroMenu" class="panel hidden">
         <h2 id="heroMenuTitle">Hero Menu</h2>
         <p id="heroMenuMeta" class="muted"></p>
@@ -508,6 +608,13 @@
       <h2>Dojo Practice Run</h2>
       <label for="subject">Category and topic</label>
       <select id="subject"></select>
+      <label for="difficulty">Quest difficulty</label>
+      <select id="difficulty">
+        <option value="guided">Guided - 5 questions, gentler HP, support reminders</option>
+        <option value="standard" selected>Standard - 5 questions, balanced challenge</option>
+        <option value="challenge">Challenge - 7 questions, higher damage, support strongly recommended</option>
+      </select>
+      <div id="difficultyNote" class="difficulty-note"></div>
       <div class="quest-preview">
         <strong>Dojo briefing:</strong>
         Open the practice run to study the subject question pool with correct answers,
@@ -530,9 +637,20 @@
       <p id="participantMeta" class="muted"></p>
       <div id="battleStats" class="battle-stats"></div>
       <div id="progress" class="progress"></div>
+      <div class="support-guide">
+        <strong>Study supports are part of this test.</strong>
+        Use them before guessing or when a question feels too easy or too hard.
+        <ul>
+          <li><strong>Hint:</strong> gives a learning clue.</li>
+          <li><strong>50/50:</strong> removes two wrong answers.</li>
+          <li><strong>Call:</strong> shows a likely study-ally suggestion.</li>
+          <li><strong>Free Pass:</strong> skips damage and moves forward when available.</li>
+        </ul>
+      </div>
       <h2 id="questionText"></h2>
       <p id="feedback"></p>
       <div id="hintBox" class="panel hidden"></div>
+      <div id="coachBox" class="coach-box hidden"></div>
       <div id="answers" class="grid"></div>
       <div class="ability-bar">
         <button id="hintBtn" class="secondary" type="button">Hint</button>
@@ -595,6 +713,7 @@
       <h2>Study Complete</h2>
       <p id="scoreLine"></p>
       <p id="submitStatus" class="muted"></p>
+      <div id="masteryReport"></div>
       <div id="storyGift"></div>
       <button id="restartBtn" class="secondary" type="button">Start Another Participant</button>
       <h2>Summary</h2>
@@ -825,6 +944,48 @@
       "NEO PRO": { maxHp: 16, damage: 5, hints: 2, fifty: 1, calls: 0, passes: 0 }
     };
 
+    const difficultyProfiles = {
+      guided: {
+        label: "Guided",
+        questionLevel: "easy",
+        questionCount: 5,
+        hpBonus: 4,
+        damageBonus: -1,
+        hintBonus: 1,
+        fiftyBonus: 1,
+        callBonus: 1,
+        passBonus: 1,
+        nudgeAfterQuestion: 0,
+        note: "Guided mode uses elementary-level questions with gentler HP and more support tools so users can learn what the buttons do."
+      },
+      standard: {
+        label: "Standard",
+        questionLevel: "medium",
+        questionCount: 5,
+        hpBonus: 0,
+        damageBonus: 0,
+        hintBonus: 0,
+        fiftyBonus: 0,
+        callBonus: 0,
+        passBonus: 0,
+        nudgeAfterQuestion: 1,
+        note: "Standard mode uses high-school-level questions with balanced HP and support options."
+      },
+      challenge: {
+        label: "Challenge",
+        questionLevel: "hard",
+        questionCount: 7,
+        hpBonus: -2,
+        damageBonus: 2,
+        hintBonus: 1,
+        fiftyBonus: 1,
+        callBonus: 1,
+        passBonus: 0,
+        nudgeAfterQuestion: 0,
+        note: "Challenge mode uses college-and-higher moderate knowledge questions with more questions and higher damage. Support tools are strongly recommended before guessing."
+      }
+    };
+
     const heroBattleActions = {
       Warrior: "steps forward, shield raised, ready to turn a careful answer into a brave strike",
       Mage: "opens the rune journal, looking for the pattern hidden inside the challenge",
@@ -906,6 +1067,169 @@
       q(75, "Software Testing", "A regression test helps check that old behavior:", ["Still works after changes", "Is deleted immediately", "Never needs testing", "Only runs on paper"], 0)
     ];
 
+    questions.push(
+      q(1001, "Arithmetic", "What is 7 + 5?", ["10", "11", "12", "13"], 2, "easy"),
+      q(1002, "Arithmetic", "What is 20 - 8?", ["10", "11", "12", "14"], 2, "easy"),
+      q(1003, "Fractions", "Which picture idea means one half?", ["1 out of 2 equal parts", "1 out of 3 equal parts", "2 out of 5 equal parts", "3 out of 4 equal parts"], 0, "easy"),
+      q(1004, "Geometry", "How many sides does a triangle have?", ["2", "3", "4", "5"], 1, "easy"),
+      q(1005, "Algebra", "If a box plus 2 equals 5, what is in the box?", ["2", "3", "4", "7"], 1, "easy"),
+      q(1006, "Data Literacy", "Which chart uses bars to compare amounts?", ["Bar chart", "Map", "Calendar", "Paragraph"], 0, "easy"),
+      q(1007, "Arithmetic", "What is 4 x 3?", ["7", "10", "12", "16"], 2, "easy"),
+      q(1008, "Fractions", "Which fraction means one whole split into four equal pieces and one piece shaded?", ["1/2", "1/3", "1/4", "4/1"], 2, "easy"),
+      q(1011, "Arithmetic", "What is 15% of 200?", ["15", "20", "30", "40"], 2, "hard"),
+      q(1012, "Algebra", "Solve for x: 2x + 5 = 17.", ["4", "5", "6", "11"], 2, "hard"),
+      q(1013, "Geometry", "A rectangle has length 9 and width 4. What is its area?", ["13", "26", "36", "81"], 2, "hard"),
+      q(1014, "Fractions", "Which is equivalent to 3/4?", ["0.25", "0.5", "0.75", "1.25"], 2, "hard"),
+      q(1015, "Data Literacy", "A dataset has values 4, 8, 8, and 12. What is the mean?", ["7", "8", "9", "12"], 1, "hard"),
+      q(1016, "Algebra", "If y = 3x - 2 and x = 5, what is y?", ["10", "11", "13", "17"], 2, "hard"),
+      q(1017, "Geometry", "A circle's diameter is 10. What is its radius?", ["2", "5", "10", "20"], 1, "hard"),
+      q(1018, "Data Literacy", "If a line graph rises from left to right, the trend is generally:", ["decreasing", "increasing", "unchanged", "missing"], 1, "hard"),
+
+      q(1101, "Life Science", "Which living thing lays eggs?", ["Bird", "Rock", "Chair", "Cloud"], 0, "easy"),
+      q(1102, "Earth Science", "Rain falls from:", ["Clouds", "The ground", "A desk", "A lamp"], 0, "easy"),
+      q(1103, "Physical Science", "Which object is usually pulled by a magnet?", ["Iron nail", "Paper cup", "Wood block", "Plastic spoon"], 0, "easy"),
+      q(1104, "Space Science", "We live on planet:", ["Mars", "Earth", "Jupiter", "Venus"], 1, "easy"),
+      q(1105, "Scientific Method", "A scientist should record what they:", ["guess only", "observe", "wish", "hide"], 1, "easy"),
+      q(1106, "Life Science", "People breathe in mostly through their:", ["lungs", "knees", "hair", "fingernails"], 0, "easy"),
+      q(1107, "Earth Science", "A mountain is a landform that is usually:", ["very flat", "high above nearby land", "under a bed", "made of glass"], 1, "easy"),
+      q(1108, "Space Science", "The Moon is closest to:", ["Earth", "Saturn", "Pluto", "The Sun"], 0, "easy"),
+      q(1111, "Life Science", "In cells, mitochondria are most associated with:", ["energy production", "long-term memory", "weather patterns", "sound waves"], 0, "hard"),
+      q(1112, "Earth Science", "Plate tectonics best explains:", ["continental movement", "how passwords work", "plant photosynthesis", "binary search"], 0, "hard"),
+      q(1113, "Physical Science", "Newton's second law relates force, mass, and:", ["acceleration", "temperature", "volume", "color"], 0, "hard"),
+      q(1114, "Space Science", "A star's apparent brightness from Earth depends on luminosity and:", ["distance", "keyboard type", "soil pH", "file size"], 0, "hard"),
+      q(1115, "Scientific Method", "A control group helps researchers:", ["compare against the tested condition", "avoid collecting data", "change every variable", "skip replication"], 0, "hard"),
+      q(1116, "Life Science", "Natural selection acts most directly on:", ["heritable variation", "calendar dates", "computer storage", "ocean tides only"], 0, "hard"),
+      q(1117, "Physical Science", "An object with balanced forces will have:", ["no change in motion", "infinite speed", "negative mass", "no gravity"], 0, "hard"),
+      q(1118, "Earth Science", "The rock cycle describes transitions among igneous, sedimentary, and:", ["metamorphic rocks", "software apps", "cloud accounts", "animal cells"], 0, "hard"),
+
+      q(1201, "U.S. History", "Which holiday celebrates U.S. independence?", ["July 4", "January 1", "October 31", "February 14"], 0, "easy"),
+      q(1202, "World History", "Pyramids are strongly associated with ancient:", ["Egypt", "Canada", "Australia", "Iceland"], 0, "easy"),
+      q(1203, "Civics", "A mayor usually helps lead a:", ["city", "planet", "classroom pencil", "keyboard"], 0, "easy"),
+      q(1204, "Geography", "A map helps people find:", ["places", "passwords", "feelings", "music volume"], 0, "easy"),
+      q(1205, "U.S. History", "The American flag has stars and:", ["stripes", "triangles only", "wheels", "keys"], 0, "easy"),
+      q(1206, "World History", "Castles are often connected with:", ["medieval history", "outer space", "computer code only", "modern email"], 0, "easy"),
+      q(1207, "Civics", "Rules made by government are called:", ["laws", "snacks", "screens", "clouds"], 0, "easy"),
+      q(1208, "Geography", "An ocean is a large body of:", ["water", "sand only", "fire", "metal"], 0, "easy"),
+      q(1211, "U.S. History", "Federalism divides power between national and:", ["state governments", "private hobbies", "search engines", "school lockers"], 0, "hard"),
+      q(1212, "World History", "The Industrial Revolution is most associated with growth in:", ["mechanized production", "hunter-gatherer migration only", "ancient cave art", "stone tools only"], 0, "hard"),
+      q(1213, "Civics", "Judicial review allows courts to assess whether laws are:", ["constitutional", "popular on social media", "profitable", "written in pencil"], 0, "hard"),
+      q(1214, "Geography", "Latitude measures distance north or south of the:", ["Equator", "Prime Meridian", "Pacific Ocean", "North Pole only"], 0, "hard"),
+      q(1215, "U.S. History", "The Reconstruction era followed which conflict?", ["Civil War", "War of 1812", "World War II", "Korean War"], 0, "hard"),
+      q(1216, "World History", "The Silk Road primarily connected regions through:", ["trade networks", "space travel", "modern email", "telephone lines"], 0, "hard"),
+      q(1217, "Civics", "A bicameral legislature has:", ["two chambers", "one judge", "no elections", "four presidents"], 0, "hard"),
+      q(1218, "Geography", "Longitude measures distance east or west of the:", ["Prime Meridian", "Equator", "Tropic of Cancer", "Arctic Circle"], 0, "hard"),
+
+      q(1301, "Digital Literacy", "Which device lets you type letters?", ["Keyboard", "Plate", "Pencil sharpener", "Shoe"], 0, "easy"),
+      q(1302, "Hardware Basics", "A mouse helps you:", ["point and click", "cook food", "wash clothes", "paint walls"], 0, "easy"),
+      q(1303, "Software Basics", "A game app is:", ["software", "a chair", "a cable", "a battery"], 0, "easy"),
+      q(1304, "Productivity Tools", "A calendar app helps track:", ["dates", "rocks", "weather only", "electricity"], 0, "easy"),
+      q(1305, "Digital Literacy", "To open a website, you usually use a:", ["web browser", "hammer", "backpack", "microscope"], 0, "easy"),
+      q(1306, "Hardware Basics", "A screen is also called a:", ["monitor", "router", "folder", "spreadsheet"], 0, "easy"),
+      q(1307, "Software Basics", "Updating an app often fixes:", ["bugs", "pencils", "chairs", "paper cuts"], 0, "easy"),
+      q(1308, "Productivity Tools", "Slides are commonly made with:", ["presentation software", "a router", "a keyboard cable", "a firewall"], 0, "easy"),
+      q(1311, "Digital Literacy", "Metadata in a file can include:", ["creation date and author", "only screen brightness", "battery charge only", "keyboard color"], 0, "hard"),
+      q(1312, "Hardware Basics", "RAM is primarily used for:", ["temporary working memory", "permanent printed output", "internet domain naming", "screen cleaning"], 0, "hard"),
+      q(1313, "Software Basics", "An API is best described as:", ["a defined way for software to communicate", "a type of monitor", "a password manager only", "a storage cable"], 0, "hard"),
+      q(1314, "Productivity Tools", "A spreadsheet formula beginning with '=' usually:", ["calculates a value", "deletes the file", "turns off Wi-Fi", "encrypts the keyboard"], 0, "hard"),
+      q(1315, "Digital Literacy", "Version history in a document mainly helps users:", ["review or restore earlier changes", "increase monitor size", "replace all passwords", "avoid saving"], 0, "hard"),
+      q(1316, "Hardware Basics", "An SSD differs from an HDD mainly by using:", ["flash memory", "paper tape", "water cooling only", "optical glass"], 0, "hard"),
+      q(1317, "Software Basics", "Open-source software means the source code is generally:", ["available to inspect or modify under a license", "never shared", "stored only on paper", "not executable"], 0, "hard"),
+      q(1318, "Productivity Tools", "Conditional formatting is used to:", ["style cells based on rules", "replace the CPU", "hide all files", "block all emails"], 0, "hard"),
+
+      q(1401, "Internet Safety", "You should keep passwords:", ["private", "posted online", "on a public board", "shared with strangers"], 0, "easy"),
+      q(1402, "Internet Safety", "A lock icon near a web address can mean the connection is:", ["encrypted", "offline", "a game", "a printer"], 0, "easy"),
+      q(1403, "Internet Safety", "If a stranger asks for your password, you should:", ["not share it", "send it quickly", "post it publicly", "make it shorter"], 0, "easy"),
+      q(1404, "Internet Safety", "A safe username should avoid sharing your:", ["private personal details", "favorite color only", "game score", "avatar"], 0, "easy"),
+      q(1405, "Internet Safety", "Before downloading, it is smart to check whether the source is:", ["trusted", "random", "unknown", "misspelled only"], 0, "easy"),
+      q(1406, "Internet Safety", "Two-factor login often sends a code to your:", ["phone or email", "shoe", "chair", "notebook only"], 0, "easy"),
+      q(1407, "Internet Safety", "A phishing message tries to trick you into sharing:", ["private information", "homework answers only", "weather reports", "book titles"], 0, "easy"),
+      q(1408, "Internet Safety", "On public Wi-Fi, be careful with:", ["sensitive logins", "screen brightness", "keyboard height", "wallpaper"], 0, "easy"),
+      q(1411, "Internet Safety", "Spear phishing differs from generic phishing because it is:", ["targeted to a specific person or organization", "always harmless", "only sent by mail carriers", "never uses email"], 0, "hard"),
+      q(1412, "Internet Safety", "A password manager primarily helps users:", ["store and generate strong passwords", "increase CPU speed", "erase browser history every second", "remove all updates"], 0, "hard"),
+      q(1413, "Internet Safety", "Multi-factor authentication reduces risk by requiring:", ["more than one proof of identity", "a shorter password", "public account sharing", "no verification"], 0, "hard"),
+      q(1414, "Internet Safety", "HTTPS protects data in transit mainly through:", ["encryption", "bigger fonts", "faster typing", "screen locking only"], 0, "hard"),
+      q(1415, "Internet Safety", "A zero-trust security model assumes:", ["no request is trusted automatically", "all users are always safe", "passwords are unnecessary", "malware cannot exist"], 0, "hard"),
+      q(1416, "Internet Safety", "A common sign of a malicious URL is:", ["a misleading or misspelled domain", "a readable title", "normal punctuation", "a short page load"], 0, "hard"),
+      q(1417, "Internet Safety", "Least privilege means users should receive:", ["only the access needed for the task", "administrator rights always", "no passwords", "every file by default"], 0, "hard"),
+      q(1418, "Internet Safety", "Security updates are important because they often:", ["patch known vulnerabilities", "change the wallpaper only", "delete useful files", "make passwords public"], 0, "hard"),
+
+      q(1451, "Internet Safety", "Which action is safest when an email asks you to log in through an unexpected link?", ["Visit the site directly or verify the sender first", "Click immediately", "Reply with your password", "Forward it to strangers"], 0, "medium"),
+      q(1452, "Internet Safety", "A strong password should be:", ["long and unique", "your first name", "123456", "the word password"], 0, "medium"),
+      q(1453, "Internet Safety", "What is a good reason to update software?", ["Updates can fix security problems", "Updates make passwords public", "Updates always remove features", "Updates turn off encryption"], 0, "medium"),
+      q(1454, "Internet Safety", "When using public Wi-Fi, which activity needs extra caution?", ["Signing into sensitive accounts", "Reading a public weather page", "Opening a calculator", "Changing screen brightness"], 0, "medium"),
+      q(1455, "Internet Safety", "A backup helps protect against:", ["data loss", "screen glare", "keyboard dust", "low volume"], 0, "medium"),
+      q(1456, "Data Structures", "Which data structure uses last-in, first-out behavior?", ["Stack", "Queue", "Set", "Tree"], 0, "medium"),
+      q(1457, "Data Structures", "Which structure stores values in parent-child relationships?", ["Tree", "Queue", "Flat file only", "String"], 0, "medium"),
+      q(1458, "Data Structures", "A hash map is useful when you need fast lookup by:", ["key", "screen size", "battery level", "font color"], 0, "medium"),
+      q(1459, "Data Structures", "Which structure is made of nodes connected by edges?", ["Graph", "Array", "Boolean", "Loop"], 0, "medium"),
+      q(1460, "Data Structures", "An array usually stores elements in:", ["indexed order", "random folders", "separate planets", "only one bit"], 0, "medium"),
+      q(1461, "Algorithms", "Which search checks items one at a time until it finds a match?", ["Linear search", "Merge sort", "Hashing", "Recursion only"], 0, "medium"),
+      q(1462, "Algorithms", "Which sorting method repeatedly compares neighboring items?", ["Bubble sort", "Binary search", "Breadth-first search", "Hash lookup"], 0, "medium"),
+      q(1463, "Complexity", "O(n) usually means work grows:", ["linearly with input size", "not at all", "exponentially always", "backward"], 0, "medium"),
+      q(1464, "Complexity", "O(n^2) often appears with:", ["nested loops over the same input", "one simple assignment", "constant lookup only", "a single print statement"], 0, "medium"),
+      q(1465, "Python", "Which Python type stores an ordered, changeable collection?", ["list", "int", "bool", "None"], 0, "medium"),
+      q(1466, "Python", "Which keyword starts a conditional branch in Python?", ["if", "when", "caseonly", "branch"], 0, "medium"),
+      q(1467, "OOP", "A class is best described as:", ["a blueprint for objects", "a network cable", "a data backup", "a web address"], 0, "medium"),
+      q(1468, "Software Design", "Why do developers split code into smaller functions?", ["To make code easier to read, test, and reuse", "To make every file harder to open", "To remove all variables", "To avoid saving work"], 0, "medium"),
+
+      q(1501, "Programming Fundamentals", "A loop repeats:", ["instructions", "paper", "monitors", "passwords"], 0, "easy"),
+      q(1502, "Python", "Which symbol starts a Python comment?", ["#", "$", "@", "&"], 0, "easy"),
+      q(1503, "OOP", "An object can have data and:", ["behavior", "weather", "gravity", "lunch"], 0, "easy"),
+      q(1504, "Software Design", "A simple plan before coding is part of:", ["design", "guessing", "deleting", "printing"], 0, "easy"),
+      q(1505, "Version Control", "Git helps track changes in:", ["files", "weather", "desk height", "battery shape"], 0, "easy"),
+      q(1506, "Algorithms", "A recipe is like an algorithm because it has:", ["steps", "clouds", "paint", "wheels"], 0, "easy"),
+      q(1507, "Data Structures", "A list stores:", ["items", "rain", "sound only", "electricity"], 0, "easy"),
+      q(1508, "Software Testing", "Testing checks whether software:", ["works as expected", "is heavy", "has a color", "needs a chair"], 0, "easy"),
+      q(1509, "Algorithms", "Sorting means putting items in:", ["order", "a cloud", "a battery", "a password"], 0, "easy"),
+      q(1520, "Complexity", "A faster method usually uses:", ["fewer steps", "more guessing", "larger text", "random clicks"], 0, "easy"),
+      q(1521, "Algorithms", "Searching means trying to:", ["find something", "paint a screen", "charge a battery", "erase a keyboard"], 0, "easy"),
+      q(1522, "Complexity", "If a task takes more steps with more items, the work:", ["grows", "disappears", "turns blue", "stops counting"], 0, "easy"),
+      q(1523, "Data Structures", "A queue is like people waiting in:", ["a line", "a circle of planets", "a locked file", "a color wheel"], 0, "easy"),
+      q(1524, "Data Structures", "A stack is like:", ["plates piled up", "rain falling", "a loud song", "a blank screen"], 0, "easy"),
+      q(1525, "Data Structures", "A dictionary stores words with:", ["meanings", "weather", "battery power", "screen size"], 0, "easy"),
+      q(1526, "Data Structures", "A tree structure has branches from:", ["a root", "a printer", "a password", "a monitor"], 0, "easy"),
+      q(1527, "Python", "Python code is written in:", ["text", "water", "wood", "glass"], 0, "easy"),
+      q(1528, "Programming Fundamentals", "A variable stores:", ["a value", "a chair", "a planet", "a keyboard key only"], 0, "easy"),
+      q(1529, "Python", "The print function shows text on the:", ["screen", "floor", "moon", "router"], 0, "easy"),
+      q(1530, "OOP", "A method is a function that belongs to:", ["an object or class", "a wall", "a keyboard cable", "a battery"], 0, "easy"),
+      q(1531, "Software Engineering", "A bug is a problem in:", ["software", "a sandwich", "a desk", "a cloud only"], 0, "easy"),
+      q(1532, "Software Design", "Breaking a big program into smaller parts can make it:", ["easier to manage", "impossible to open", "less readable always", "not software"], 0, "easy"),
+      q(1533, "Version Control", "A branch lets developers work on:", ["changes separately", "screen brightness", "printer paper", "a weather map"], 0, "easy"),
+      q(1534, "Software Testing", "A test result can show pass or:", ["fail", "blue", "loud", "heavy"], 0, "easy"),
+      q(1511, "Programming Fundamentals", "A pure function is easiest to test because it:", ["returns consistent output for the same input", "changes global state constantly", "requires random timing", "deletes its arguments"], 0, "hard"),
+      q(1512, "Python", "A Python list comprehension is commonly used to:", ["build a list from an iterable expression", "compile the kernel", "open a database port", "encrypt every file"], 0, "hard"),
+      q(1513, "OOP", "Polymorphism allows different classes to:", ["respond to the same interface differently", "share one memory address always", "avoid methods", "remove abstraction"], 0, "hard"),
+      q(1514, "Software Design", "Loose coupling generally improves:", ["maintainability", "syntax errors", "network latency always", "screen resolution"], 0, "hard"),
+      q(1515, "Version Control", "A merge conflict occurs when:", ["changes overlap and Git needs help combining them", "a file is too small", "a branch has no name", "a commit is perfect"], 0, "hard"),
+      q(1516, "Algorithms", "A stable sort preserves the relative order of:", ["equal elements", "all files", "network packets only", "deleted rows"], 0, "hard"),
+      q(1517, "Data Structures", "A hash table relies on a hash function to:", ["map keys to storage locations", "sort by height", "draw diagrams", "compile code"], 0, "hard"),
+      q(1518, "Software Testing", "Mock objects are often used to:", ["isolate code from external dependencies", "replace source control", "avoid assertions", "increase screen size"], 0, "hard"),
+      q(1535, "Algorithms", "Dynamic programming is most useful when a problem has overlapping subproblems and:", ["optimal substructure", "no repeated work", "only one input", "no solution state"], 0, "hard"),
+      q(1536, "Complexity", "Binary search has logarithmic time because each step:", ["halves the remaining search space", "checks every item twice", "sorts the full array", "uses random guessing"], 0, "hard"),
+      q(1537, "Algorithms", "Breadth-first search commonly uses which structure to explore by layers?", ["Queue", "Stack", "Heap", "Set only"], 0, "hard"),
+      q(1538, "Complexity", "If an algorithm doubles work with every added input item, it is closest to:", ["exponential growth", "constant time", "linear growth", "logarithmic growth"], 0, "hard"),
+      q(1539, "Algorithms", "Dijkstra's algorithm is used to find:", ["shortest paths with nonnegative edge weights", "image brightness", "password length", "compiler syntax only"], 0, "hard"),
+      q(1540, "Complexity", "Amortized analysis evaluates cost:", ["averaged across a sequence of operations", "only on the first line", "without inputs", "by ignoring worst cases always"], 0, "hard"),
+      q(1541, "Data Structures", "A balanced binary search tree keeps operations efficient by controlling:", ["tree height", "screen width", "variable names", "network ports"], 0, "hard"),
+      q(1542, "Data Structures", "A priority queue usually removes the item with:", ["highest or lowest priority", "largest filename", "newest password", "most colors"], 0, "hard"),
+      q(1543, "Data Structures", "A graph adjacency list stores:", ["neighbors for each vertex", "only sorted numbers", "one global password", "screen pixels"], 0, "hard"),
+      q(1544, "Data Structures", "A trie is especially useful for:", ["prefix-based string lookup", "floating point math only", "image compression only", "CPU scheduling only"], 0, "hard"),
+      q(1545, "Data Structures", "A heap maintains quick access to:", ["the min or max element", "all sorted elements", "only duplicate values", "the oldest file"], 0, "hard"),
+      q(1546, "Data Structures", "Collision handling is a design concern in:", ["hash tables", "linked lists only", "plain strings", "booleans"], 0, "hard"),
+      q(1547, "Python", "A Python decorator commonly wraps or modifies:", ["a function or class", "the operating system kernel", "a monitor cable", "a database table only"], 0, "hard"),
+      q(1548, "Programming Fundamentals", "Recursion requires a base case to prevent:", ["infinite calls", "syntax highlighting", "variable assignment", "module imports"], 0, "hard"),
+      q(1549, "Python", "A generator function uses yield to:", ["produce values lazily", "force eager sorting", "delete a list", "compile bytecode manually"], 0, "hard"),
+      q(1550, "OOP", "Dependency injection improves testability by:", ["providing dependencies from outside the class", "hiding all interfaces", "removing constructors", "forcing globals"], 0, "hard"),
+      q(1551, "Python", "A context manager is commonly used to manage:", ["setup and cleanup for resources", "keyboard brightness", "browser tabs only", "CSS colors"], 0, "hard"),
+      q(1552, "Programming Fundamentals", "Short-circuit evaluation means an expression may:", ["skip evaluating later parts once the result is known", "run every branch twice", "ignore boolean logic", "compile without variables"], 0, "hard"),
+      q(1553, "Software Engineering", "Continuous integration is meant to:", ["test and integrate changes frequently", "avoid version control", "delay feedback", "replace all design"], 0, "hard"),
+      q(1554, "Software Design", "The single-responsibility principle says a module should have:", ["one main reason to change", "every possible feature", "no purpose", "only private names"], 0, "hard"),
+      q(1555, "Version Control", "Rebasing usually rewrites commits by:", ["placing them onto a new base", "encrypting them", "deleting the repository", "changing file permissions only"], 0, "hard"),
+      q(1556, "Software Testing", "Mutation testing evaluates tests by:", ["checking whether tests catch small code changes", "renaming every function", "deleting assertions", "mocking the compiler"], 0, "hard"),
+      q(1557, "Software Engineering", "Technical debt refers to:", ["future cost from quick or suboptimal design choices", "server electricity bills only", "syntax errors only", "deleted documentation"], 0, "hard"),
+      q(1558, "Software Design", "An interface contract defines:", ["expected behavior between components", "monitor size", "battery chemistry", "only a folder name"], 0, "hard")
+    );
+
     const hints = {
       1: "Think divide-and-conquer: you keep halving the search space.",
       2: "Customers line up first-in, first-out.",
@@ -934,10 +1258,11 @@
     ];
 
     let state = null;
+    let pendingQuestEvents = [];
     const HERO_STORE_KEY = "tutorspark.heroProfiles.v1";
 
-    function q(id, topic, prompt, options, correctIndex) {
-      return { id, topic, prompt, options, correctIndex };
+    function q(id, topic, prompt, options, correctIndex, level = "medium") {
+      return { id, topic, prompt, options, correctIndex, level };
     }
 
     function byId(id) {
@@ -957,6 +1282,18 @@
 
     function nowIso() {
       return new Date().toISOString();
+    }
+
+    function blankEvent(eventType, detail, participantCode = "") {
+      return {
+        participant_code: participantCode,
+        event_type: eventType,
+        detail,
+        question_id: "",
+        question_topic: "",
+        elapsed_seconds: "",
+        created_at: nowIso()
+      };
     }
 
     function escapeHtml(value) {
@@ -1056,6 +1393,88 @@
       renderLeaderboard();
     }
 
+    function average(values) {
+      return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+    }
+
+    function percent(value, total) {
+      return total ? `${((value / total) * 100).toFixed(1)}%` : "0%";
+    }
+
+    async function loadStudySnapshot() {
+      const summary = byId("baselineSummary");
+      const details = byId("baselineDetails");
+      summary.innerHTML = "<div class=\"baseline-stat\"><strong>Loading</strong><span>Study snapshot</span></div>";
+      details.innerHTML = "";
+      try {
+        const response = await fetch("data/study-snapshot.json", { cache: "no-store" });
+        if (!response.ok) throw new Error("Study snapshot file not available");
+        const payload = await response.json();
+        renderStudySnapshot(payload.records || []);
+      } catch (error) {
+        summary.innerHTML = "<div class=\"baseline-stat\"><strong>Unavailable</strong><span>Study snapshot could not be loaded in this preview.</span></div>";
+      }
+    }
+
+    function renderStudySnapshot(records) {
+      const summary = byId("baselineSummary");
+      const details = byId("baselineDetails");
+      const totalQuestions = records.reduce((sum, record) => sum + Number(record.score?.total || 0), 0);
+      const correctAnswers = records.reduce((sum, record) => sum + Number(record.score?.correct || 0), 0);
+      const allRatings = records.flatMap(record => (record.survey || []).map(item => Number(item.rating || 0)).filter(Boolean));
+      const supportEvents = records.flatMap(record => record.events || []).filter(event =>
+        ["hint_used", "fifty_fifty_used", "friend_call_used", "free_pass_used"].includes(event.event_type)
+      ).length;
+      const devices = records.reduce((counts, record) => {
+        const device = record.demographics?.primary_device || "unknown";
+        counts[device] = (counts[device] || 0) + 1;
+        return counts;
+      }, {});
+      const subjects = records.reduce((counts, record) => {
+        const subject = record.subjectTitle || "Unknown";
+        counts[subject] = (counts[subject] || 0) + 1;
+        return counts;
+      }, {});
+      const perfectRuns = records.filter(record => Number(record.score?.correct || 0) === Number(record.score?.total || 0)).length;
+      summary.innerHTML = [
+        [String(records.length), "Completed learning sessions"],
+        [percent(correctAnswers, totalQuestions), "Average quiz accuracy"],
+        [`${average(allRatings).toFixed(2)}/5`, "Learner experience rating"],
+        [String(perfectRuns), "Perfect quest runs"],
+        [Object.entries(devices).map(([device, count]) => `${count} ${device}`).join(", "), "Devices tested"],
+        [Object.entries(subjects).map(([subject, count]) => `${count} ${subject}`).join(", "), "Subjects tested"]
+      ].map(([value, label]) => `<div class="baseline-stat"><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span></div>`).join("");
+
+      details.innerHTML = `
+        <table class="baseline-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Device</th>
+              <th>Sessions</th>
+              <th>Average Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.entries(subjects).map(([subject, count]) => {
+              const matching = records.filter(record => record.subjectTitle === subject);
+              const subjectCorrect = matching.reduce((sum, record) => sum + Number(record.score?.correct || 0), 0);
+              const subjectTotal = matching.reduce((sum, record) => sum + Number(record.score?.total || 0), 0);
+              const deviceList = [...new Set(matching.map(record => record.demographics?.primary_device || "unknown"))].join(", ");
+              return `
+                <tr>
+                  <td>${escapeHtml(subject)}</td>
+                  <td>${escapeHtml(deviceList)}</td>
+                  <td>${count}</td>
+                  <td>${percent(subjectCorrect, subjectTotal)}</td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
     function scoreRatio(scoreText) {
       if (!scoreText) return 0;
       const [correct, total] = scoreText.split("/").map(Number);
@@ -1072,6 +1491,31 @@
           select.appendChild(option);
         }
       }
+    }
+
+    function refreshDifficultyNote() {
+      const profile = difficultyProfiles[byId("difficulty").value] || difficultyProfiles.standard;
+      byId("difficultyNote").textContent = profile.note;
+      const preview = document.querySelector(".quest-preview");
+      if (preview) {
+        preview.innerHTML = `
+          <strong>Dojo briefing:</strong>
+          Open the practice run to study the subject question pool with correct answers,
+          then begin a randomized ${profile.questionCount}-question ${profile.label.toLowerCase()} quest battle.
+        `;
+      }
+    }
+
+    function questionPoolFor(subjectKey, difficultyKey) {
+      const subject = subjects[subjectKey];
+      const difficulty = difficultyProfiles[difficultyKey] || difficultyProfiles.standard;
+      const leveledPool = questions.filter(question =>
+        subject.topics.includes(question.topic) && question.level === difficulty.questionLevel
+      );
+      if (leveledPool.length >= Math.min(difficulty.questionCount, 5)) {
+        return leveledPool;
+      }
+      return questions.filter(question => subject.topics.includes(question.topic));
     }
 
     function setupSurvey() {
@@ -1103,10 +1547,13 @@
         return;
       }
       const subjectKey = byId("subject").value;
+      const difficultyKey = byId("difficulty").value;
+      const difficulty = difficultyProfiles[difficultyKey] || difficultyProfiles.standard;
       const subject = subjects[subjectKey];
-      const pool = questions.filter(question => subject.topics.includes(question.topic));
-      byId("dojoTitle").textContent = `Dojo Practice Run: ${subject.title}`;
-      byId("dojoMeta").textContent = `${heroName} can study the full question pool here. The quest battle still draws a randomized five-question set.`;
+      const pool = questionPoolFor(subjectKey, difficultyKey);
+      pendingQuestEvents.push(blankEvent("dojo_opened", `subject=${subject.title}; difficulty=${difficulty.label}; hero_name=${heroName}; pool_size=${pool.length}`));
+      byId("dojoTitle").textContent = `Dojo Practice Run: ${subject.title} (${difficulty.label})`;
+      byId("dojoMeta").textContent = `${heroName} can study the ${difficulty.label.toLowerCase()} question pool here. The quest battle draws a randomized set each run.`;
       byId("dojoList").innerHTML = pool.length
         ? pool.map((question, index) => `<li class="dojo-card"><strong>${index + 1}. ${escapeHtml(question.topic)}</strong><p>${escapeHtml(question.prompt)}</p><div class="dojo-answer">Correct answer: ${escapeHtml(question.options[question.correctIndex])}</div></li>`).join("")
         : "<li>No practice questions available for this subject yet.</li>";
@@ -1121,19 +1568,33 @@
         return;
       }
       const subjectKey = byId("subject").value;
+      const difficultyKey = byId("difficulty").value;
+      const difficulty = difficultyProfiles[difficultyKey] || difficultyProfiles.standard;
       const subject = subjects[subjectKey];
       const profiles = loadHeroProfiles();
       const existingProfile = profiles[heroKey(heroName)] || null;
       const heroClass = document.querySelector("input[name='heroClass']:checked").value;
       const questTitle = heroQuestTitles[heroClass][subjectKey] || subject.title;
-      const pool = questions.filter(question => subject.topics.includes(question.topic));
-      const selected = shuffle(pool).slice(0, Math.min(5, pool.length));
+      const pool = questionPoolFor(subjectKey, difficultyKey);
+      const selected = shuffle(pool).slice(0, Math.min(difficulty.questionCount, pool.length));
       const participantCode = existingProfile ? existingProfile.participantCode : `P-${Date.now().toString().slice(-6)}`;
-      const stats = heroStats[heroClass] || heroStats.Warrior;
+      const baseStats = heroStats[heroClass] || heroStats.Warrior;
+      const stats = {
+        maxHp: Math.max(8, baseStats.maxHp + difficulty.hpBonus),
+        damage: Math.max(1, baseStats.damage + difficulty.damageBonus),
+        hints: Math.max(0, baseStats.hints + difficulty.hintBonus),
+        fifty: Math.max(0, baseStats.fifty + difficulty.fiftyBonus),
+        calls: Math.max(0, baseStats.calls + difficulty.callBonus),
+        passes: Math.max(0, baseStats.passes + difficulty.passBonus)
+      };
       state = {
         participantCode,
         heroName,
         heroClass,
+        difficultyKey,
+        difficultyLabel: difficulty.label,
+        difficultyNote: difficulty.note,
+        supportNudgeAfterQuestion: difficulty.nudgeAfterQuestion,
         profileStatus: existingProfile ? "loaded" : "created",
         previousQuestCount: existingProfile ? existingProfile.questCount || 0 : 0,
         questTitle,
@@ -1157,12 +1618,22 @@
         usedHint: false,
         usedFifty: false,
         usedFriend: false,
-        events: [],
+        supportUsage: {
+          hint: 0,
+          fiftyFifty: 0,
+          friendCall: 0,
+          freePass: 0,
+          dojoOpened: pendingQuestEvents.filter(event => event.event_type === "dojo_opened").length,
+          coachingNudges: 0
+        },
+        missedTopics: {},
+        events: pendingQuestEvents.map(event => ({ ...event, participant_code: participantCode })),
         survey: [],
         startedAt: nowIso(),
         questionStartedAt: performance.now()
       };
-      state.events.push(eventRow("study_started", `subject=${state.subjectTitle}; hero=${heroClass}; hero_name=${heroName}; profile=${state.profileStatus}; quest=${questTitle}`));
+      pendingQuestEvents = [];
+      state.events.push(eventRow("study_started", `subject=${state.subjectTitle}; difficulty=${difficulty.label}; hero=${heroClass}; hero_name=${heroName}; profile=${state.profileStatus}; quest=${questTitle}`));
       renderQuestion();
       show("quiz");
     }
@@ -1185,7 +1656,7 @@
       const enemyAsset = enemyAssets[enemyName];
       const missesLeft = missesRemaining();
       const hpWarning = hpWarningText();
-      byId("participantMeta").textContent = `${state.heroName} | ${state.participantCode} | ${state.heroClass} Quest: ${state.questTitle} | Question ${state.index + 1} of ${state.questions.length}`;
+      byId("participantMeta").textContent = `${state.heroName} | ${state.participantCode} | ${state.heroClass} | ${state.difficultyLabel} Quest: ${state.questTitle} | Question ${state.index + 1} of ${state.questions.length}`;
       byId("battleStats").innerHTML = [
         { text: `HP ${state.hp}/${state.maxHp}` },
         { text: `Misses Left ${missesLeft}`, danger: missesLeft <= 1 },
@@ -1208,6 +1679,7 @@
       byId("feedback").className = state.feedbackType || "";
       byId("hintBox").classList.add("hidden");
       byId("hintBox").textContent = "";
+      renderCoachBox(question);
 
       const progress = byId("progress");
       progress.innerHTML = "";
@@ -1259,6 +1731,28 @@
       state.questionStartedAt = performance.now();
     }
 
+    function totalSupportUses() {
+      if (!state || !state.supportUsage) return 0;
+      return state.supportUsage.hint + state.supportUsage.fiftyFifty + state.supportUsage.friendCall + state.supportUsage.freePass;
+    }
+
+    function renderCoachBox(question) {
+      const coachBox = byId("coachBox");
+      coachBox.classList.add("hidden");
+      coachBox.textContent = "";
+      if (!state || totalSupportUses() > 0) return;
+      const shouldNudge = state.index >= state.supportNudgeAfterQuestion || state.streak === 0 || state.hp < state.maxHp;
+      if (!shouldNudge) return;
+      coachBox.textContent = `Study coach: Try Hint, 50/50, or Call before answering if this ${question.topic} prompt feels uncertain. Support choices are part of the learning data, especially in ${state.difficultyLabel} mode.`;
+      coachBox.classList.remove("hidden");
+      if (!state.lastCoachNudgeQuestionIds) state.lastCoachNudgeQuestionIds = [];
+      if (!state.lastCoachNudgeQuestionIds.includes(question.id)) {
+        state.lastCoachNudgeQuestionIds.push(question.id);
+        state.supportUsage.coachingNudges += 1;
+        state.events.push(eventRow("coach_nudge_shown", `question_index=${state.index + 1}; topic=${question.topic}`, question));
+      }
+    }
+
     function buildBattleIntro(question, enemyName) {
       const place = subjectBattlePlaces[state.subjectKey] || "the quest arena";
       const enemyAction = enemyBattleScripts[enemyName] || "guards the next clue and waits for a careful answer";
@@ -1292,6 +1786,7 @@
       } else {
         state.hp = Math.max(0, state.hp - state.damage);
         state.streak = 0;
+        state.missedTopics[question.topic] = (state.missedTopics[question.topic] || 0) + 1;
         state.feedback = `Not quite. Correct answer: ${question.options[question.correctIndex]}. ${hpWarningText()}`;
         state.feedbackType = "result-miss";
       }
@@ -1319,6 +1814,7 @@
       if (state.hintsLeft <= 0 || state.usedHint) return;
       state.hintsLeft -= 1;
       state.usedHint = true;
+      state.supportUsage.hint += 1;
       byId("hintBox").textContent = `Hint: ${hints[question.id] || "Look for the clue that matches the core concept."}`;
       byId("hintBox").classList.remove("hidden");
       state.events.push(eventRow("hint_used", `question_index=${state.index + 1}; remaining_hints=${state.hintsLeft}`, question, elapsed));
@@ -1334,6 +1830,7 @@
       state.hiddenIndices = [...state.hiddenIndices, ...shuffle(wrong).slice(0, 2)];
       state.fiftyLeft -= 1;
       state.usedFifty = true;
+      state.supportUsage.fiftyFifty += 1;
       state.events.push(eventRow("fifty_fifty_used", `hidden=${state.hiddenIndices.join("|")}`, question, ((performance.now() - state.questionStartedAt) / 1000).toFixed(2)));
       renderQuestion();
     }
@@ -1345,6 +1842,7 @@
       const suggestion = Math.random() < 0.75 ? question.correctIndex : shuffle(wrong)[0];
       state.callsLeft -= 1;
       state.usedFriend = true;
+      state.supportUsage.friendCall += 1;
       byId("feedback").textContent = `Study ally suggests option ${suggestion + 1}: ${question.options[suggestion]}`;
       byId("feedback").className = "result-ok";
       state.events.push(eventRow("friend_call_used", `suggestion=${suggestion + 1}`, question, ((performance.now() - state.questionStartedAt) / 1000).toFixed(2)));
@@ -1357,6 +1855,7 @@
       const question = state.questions[state.index];
       if (state.freePasses <= 0) return;
       state.freePasses -= 1;
+      state.supportUsage.freePass += 1;
       state.correct += 1;
       state.feedback = "Free Pass used. No damage taken; moving to the next encounter.";
       state.feedbackType = "result-ok";
@@ -1385,15 +1884,20 @@
       state.events.push(eventRow("study_completed", "browser_submission=true"));
       saveCompletedHeroProfile();
       byId("scoreLine").textContent = `Score: ${state.correct}/${state.questions.length}`;
+      byId("masteryReport").innerHTML = buildMasteryReport();
       byId("storyGift").innerHTML = `<div class="story-scroll"><h2>Quest Story Gift</h2><p>${buildStoryGift()}</p></div>`;
       byId("summary").textContent = [
         `Participant: ${state.participantCode}`,
         `Hero name: ${state.heroName}`,
         `Hero class: ${state.heroClass}`,
+        `Difficulty: ${state.difficultyLabel}`,
         `Profile: ${state.profileStatus}`,
         `Quest: ${state.questTitle}`,
         `Subject: ${state.subjectTitle}`,
         `Score: ${state.correct}/${state.questions.length}`,
+        `Support actions used: ${totalSupportUses()}`,
+        `Coach nudges shown: ${state.supportUsage.coachingNudges}`,
+        `Missed topics: ${Object.keys(state.missedTopics).length ? Object.entries(state.missedTopics).map(([topic, count]) => `${topic} (${count})`).join(", ") : "none"}`,
         `Age range: ${state.demographics.age_range}`,
         `Learning background: ${state.demographics.learning_background}`,
         `CS experience: ${state.demographics.cs_experience}`,
@@ -1421,6 +1925,8 @@
         heroClass: state.heroClass,
         profileStatus: state.profileStatus,
         questTitle: state.questTitle,
+        difficultyKey: state.difficultyKey,
+        difficultyLabel: state.difficultyLabel,
         subjectKey: state.subjectKey,
         subjectTitle: state.subjectTitle,
         startedAt: state.startedAt,
@@ -1430,6 +1936,9 @@
           total: state.questions.length,
           percent: state.questions.length ? Math.round((state.correct / state.questions.length) * 100) : 0
         },
+        supportUsage: state.supportUsage,
+        missedTopics: state.missedTopics,
+        masteryRecommendation: buildMasteryRecommendation(),
         demographics: state.demographics,
         survey: state.survey,
         events: state.events,
@@ -1448,6 +1957,39 @@
         throw new Error(result.error || "Study submission failed");
       }
       return result;
+    }
+
+    function buildMasteryRecommendation() {
+      const missed = Object.entries(state.missedTopics).sort((a, b) => b[1] - a[1]);
+      if (!missed.length && totalSupportUses() > 0) {
+        return "Ready for a harder quest in the same subject. Keep using support tools when uncertainty appears.";
+      }
+      if (!missed.length) {
+        return "Ready for a harder quest. For better study evidence next time, try one support tool before answering a difficult prompt.";
+      }
+      const focus = missed.slice(0, 2).map(([topic]) => topic).join(" and ");
+      return `Review ${focus}, then run the Dojo before the next quest and use Hint or 50/50 on the first uncertain prompt.`;
+    }
+
+    function buildMasteryReport() {
+      const supportCount = totalSupportUses();
+      const missed = Object.keys(state.missedTopics).length
+        ? Object.entries(state.missedTopics).map(([topic, count]) => `${escapeHtml(topic)} (${count})`).join(", ")
+        : "No missed topics recorded.";
+      const recommendation = buildMasteryRecommendation();
+      return `
+        <div class="panel">
+          <h2>Personalized Mastery Report</h2>
+          <div class="mastery-grid">
+            <div class="mastery-card"><strong>Difficulty</strong><span>${escapeHtml(state.difficultyLabel)}</span></div>
+            <div class="mastery-card"><strong>Accuracy</strong><span>${state.correct}/${state.questions.length} correct</span></div>
+            <div class="mastery-card"><strong>Support Used</strong><span>${supportCount} action${supportCount === 1 ? "" : "s"}</span></div>
+            <div class="mastery-card"><strong>Coach Nudges</strong><span>${state.supportUsage.coachingNudges}</span></div>
+            <div class="mastery-card"><strong>Focus Topics</strong><span>${missed}</span></div>
+          </div>
+          <p><strong>Next learning step:</strong> ${escapeHtml(recommendation)}</p>
+        </div>
+      `;
     }
 
     function buildStoryGift() {
@@ -1497,7 +2039,9 @@
 
     setupSubjects();
     setupSurvey();
+    refreshDifficultyNote();
     renderHomeLists();
+    loadStudySnapshot();
     byId("heroName").addEventListener("input", refreshHeroProfileStatus);
     byId("heroName").addEventListener("blur", refreshHeroProfileStatus);
     document.querySelectorAll("input[name='heroClass']").forEach(radio => {
@@ -1505,6 +2049,7 @@
     });
     refreshHeroProfileStatus();
     byId("dojoBtn").addEventListener("click", openDojoPractice);
+    byId("difficulty").addEventListener("change", refreshDifficultyNote);
     byId("dojoBeginBtn").addEventListener("click", beginStudy);
     byId("dojoBackBtn").addEventListener("click", () => show("start"));
     byId("beginBtn").addEventListener("click", beginStudy);

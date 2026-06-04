@@ -38,6 +38,7 @@ function toCsv(records) {
       "participant_code",
       "hero_name",
       "hero_class",
+      "difficulty",
       "quest_title",
       "subject_title",
       "score_correct",
@@ -49,15 +50,30 @@ function toCsv(records) {
       "open_feedback",
       "frustration_notes",
       "positive_notes",
+      "support_actions_used",
+      "dojo_opened",
+      "coach_nudges",
+      "missed_topics",
+      "mastery_recommendation",
     ],
   ];
   for (const record of records) {
+    const supportUsage = record.supportUsage || {};
+    const supportActionsUsed =
+      Number(supportUsage.hint || 0) +
+      Number(supportUsage.fiftyFifty || 0) +
+      Number(supportUsage.friendCall || 0) +
+      Number(supportUsage.freePass || 0);
+    const missedTopics = record.missedTopics
+      ? Object.entries(record.missedTopics).map(([topic, count]) => `${topic} (${count})`).join("; ")
+      : "";
     rows.push([
       record._id,
       record.submittedAt,
       record.participantCode,
       record.heroName,
       record.heroClass,
+      record.difficultyLabel || record.difficultyKey || "",
       record.questTitle,
       record.subjectTitle,
       record.score && record.score.correct,
@@ -69,6 +85,11 @@ function toCsv(records) {
       record.demographics && record.demographics.open_feedback,
       record.demographics && record.demographics.frustration_notes,
       record.demographics && record.demographics.positive_notes,
+      supportActionsUsed,
+      supportUsage.dojoOpened || 0,
+      supportUsage.coachingNudges || 0,
+      missedTopics,
+      record.masteryRecommendation || "",
     ]);
   }
   return rows.map((row) => row.map(csvEscape).join(",")).join("\n");
