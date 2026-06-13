@@ -85,8 +85,8 @@
       cursor: pointer;
     }
     button:hover, .button:hover { background: var(--accent-dark); }
-    button.secondary { background: #334155; }
-    button.secondary:hover { background: #1e293b; }
+    button.secondary, .button.secondary { background: #334155; }
+    button.secondary:hover, .button.secondary:hover { background: #1e293b; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -598,7 +598,9 @@
           <div class="menu-card"><strong>Progress Report</strong><span id="heroProgressSummary"></span></div>
           <div class="menu-card"><strong>Leaderboard</strong><span>Compare completed quest scores from saved heroes below.</span></div>
           <div class="menu-card"><strong>TutorSpark Data</strong><span>Completed quest surveys save automatically for the learning analysis.</span></div>
+          <div class="menu-card"><strong>User Research Survey</strong><span>Already tested TutorSpark? Share feedback in the optional Week 2.7 survey.</span></div>
         </div>
+        <a id="heroResearchSurveyLink" class="button secondary" href="https://docs.google.com/forms/d/e/1FAIpQLSfd255oZsachWqTeHnIlEBZLN8VirK6m3rWB3fee-glE85Z1A/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">Take Optional Research Survey</a>
         <div id="heroStats"></div>
         <h2>Leaderboard</h2>
         <ol id="leaderboardList"></ol>
@@ -715,6 +717,12 @@
       <p id="submitStatus" class="muted"></p>
       <div id="masteryReport"></div>
       <div id="storyGift"></div>
+      <div class="quest-preview">
+        <strong>Optional next step:</strong>
+        Help improve TutorSpark by completing the Week 2.7 user research survey.
+        This opens in a new tab and can also be shared with returning testers.
+      </div>
+      <a id="completionResearchSurveyLink" class="button" href="https://docs.google.com/forms/d/e/1FAIpQLSfd255oZsachWqTeHnIlEBZLN8VirK6m3rWB3fee-glE85Z1A/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">Take Optional Research Survey</a>
       <button id="restartBtn" class="secondary" type="button">Start Another Participant</button>
       <h2>Summary</h2>
       <pre id="summary" class="summary"></pre>
@@ -722,6 +730,8 @@
   </main>
 
   <script>
+    const userResearchSurveyUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfd255oZsachWqTeHnIlEBZLN8VirK6m3rWB3fee-glE85Z1A/viewform?usp=publish-editor";
+
     const categories = [
       { key: "math", title: "Math", subjects: ["basic_math"] },
       { key: "science", title: "Science", subjects: ["general_science"] },

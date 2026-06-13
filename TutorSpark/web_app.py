@@ -39,6 +39,11 @@ from quest_lore import build_battle_intro, build_story_gift, get_hero_subject_qu
 HOST = "0.0.0.0"
 PORT = int(os.environ.get("PORT", "8080"))
 QUIZ_LENGTH = 5
+USER_RESEARCH_SURVEY_URL = (
+    "https://docs.google.com/forms/d/e/"
+    "1FAIpQLSfd255oZsachWqTeHnIlEBZLN8VirK6m3rWB3fee-glE85Z1A/"
+    "viewform?usp=publish-editor"
+)
 
 SURVEY_PROMPTS = [
     ("interface_clarity", "The interface was easy to understand."),
@@ -441,7 +446,7 @@ def _page(title: str, body: str) -> bytes:
       text-decoration: none;
       cursor: pointer;
     }}
-    button.secondary {{ background: #334155; }}
+    button.secondary, .button.secondary {{ background: #334155; }}
     button.warning {{ background: var(--warn); }}
     button:hover, .button:hover {{ background: var(--accent-dark); }}
     .result-ok {{ color: #166534; font-weight: 700; }}
@@ -730,9 +735,11 @@ class TutorSparkWebHandler(BaseHTTPRequestHandler):
     <div class="menu-card"><strong>Leaderboard</strong><span>Compare completed quest scores from saved heroes below.</span></div>
     <div class="menu-card"><strong>Export Study CSV</strong><span>On Pi/CLI, option 6 exports the full study bundle after completed quests.</span></div>
     <div class="menu-card"><strong>Learning Analysis Bundle</strong><span>On Pi/CLI, option 7 creates the analysis report from completed quests.</span></div>
+    <div class="menu-card"><strong>User Research Survey</strong><span>Already tested TutorSpark? Share feedback in the optional Week 2.7 survey.</span></div>
   </div>
   <div class="stat-line"><span>Average answer time</span><strong>{summary['average_answer_seconds']:.1f}s</strong></div>
   <div class="stat-line"><span>Slowest answer time</span><strong>{summary['slowest_answer_seconds']:.1f}s</strong></div>
+  <a class="button secondary" href="{USER_RESEARCH_SURVEY_URL}" target="_blank" rel="noopener noreferrer">Take Optional Research Survey</a>
 </section>
 
 <section class="panel">
@@ -1267,6 +1274,12 @@ class TutorSparkWebHandler(BaseHTTPRequestHandler):
   {score}
   <p>Your anonymous learning data and survey feedback were recorded for TutorSpark Learning.</p>
   {story}
+  <div class="quest-preview">
+    <strong>Optional next step:</strong>
+    Help improve TutorSpark by completing the Week 2.7 user research survey.
+    This opens in a new tab and can also be shared with returning testers.
+  </div>
+  <a class="button" href="{USER_RESEARCH_SURVEY_URL}" target="_blank" rel="noopener noreferrer">Take Optional Research Survey</a>
   <a class="button" href="/">Start Another Session</a>
 </section>
 """
